@@ -17,7 +17,7 @@ export function StatsCards({ grades, lessons, studentCount, type, mode }: StatsC
     );
 
     if (mode === 'attendance') {
-        // Statistics for attendance
+        // Статистика для відвідуваності (без змін)
         const totalPossibleAttendances = studentCount * filteredLessons.length;
         const actualAttendances = relevantGrades.filter(g => g.attended).length;
         const attendanceRate = totalPossibleAttendances > 0
@@ -26,7 +26,6 @@ export function StatsCards({ grades, lessons, studentCount, type, mode }: StatsC
 
         const totalAbsences = relevantGrades.filter(g => !g.attended).length;
 
-        // Average extra points for lectures
         const totalExtraPoints = relevantGrades.reduce((sum, g) => sum + g.extraPoints, 0);
         const avgExtraPoints = relevantGrades.length > 0
             ? (totalExtraPoints / relevantGrades.length).toFixed(2)
@@ -92,11 +91,22 @@ export function StatsCards({ grades, lessons, studentCount, type, mode }: StatsC
             </div>
         );
     } else {
-        // Statistics for grades
-        const gradesWithScores = relevantGrades.filter(g => g.score !== null && g.attended);
-        const averageGrade = gradesWithScores.length > 0
-            ? (gradesWithScores.reduce((sum, g) => sum + (g.score || 0) + g.extraPoints, 0) / gradesWithScores.length).toFixed(2)
+        // --- ОНОВЛЕНА ЛОГІКА РОЗРАХУНКУ СЕРЕДНЬОГО БАЛУ ---
+        // 1. Розраховуємо загальну суму балів усіх студентів за всі заняття.
+        // Ця логіка ідентична тій, що використовується для стовпця "Сума" в CombinedTable.
+        const totalSumOfAllStudents = relevantGrades.reduce((sum, g) => {
+            if (g.attended) {
+                const baseScore = type === 'practical' ? (g.score || 0) : 0;
+                return sum + baseScore + g.extraPoints;
+            }
+            return sum;
+        }, 0);
+
+        // 2. Ділимо загальну суму балів на кількість студентів.
+        const averageGrade = studentCount > 0
+            ? (totalSumOfAllStudents / studentCount).toFixed(2)
             : '0.00';
+        // --- КІНЕЦЬ ОНОВЛЕНОЇ ЛОГІКИ ---
 
         const totalPossibleAttendances = studentCount * filteredLessons.length;
         const actualAttendances = relevantGrades.filter(g => g.attended).length;

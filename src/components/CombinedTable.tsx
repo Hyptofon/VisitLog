@@ -102,7 +102,7 @@ const ScrollArea = ({ className, children }: { className?: string, children: Rea
     </div>
 );
 
-// --- DATE PAGINATION COMPONENT ---
+// --- DATE PAGINATION COMPONENT (ОНОВЛЕНО) ---
 interface DatePaginationProps {
     currentPage: number;
     totalPages: number;
@@ -111,26 +111,35 @@ interface DatePaginationProps {
 
 function DatePagination({ currentPage, totalPages, onPageChange }: DatePaginationProps) {
     return (
-        <div className="flex items-center justify-center space-x-2">
+        <div className="flex items-center justify-center gap-2">
             <Button
                 variant="outline"
                 size="sm"
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 0}
+                className="px-2.5 sm:px-3"
             >
                 <ChevronLeft className="h-4 w-4" />
-                <span>Попередні</span>
+                <span className="hidden sm:inline sm:ml-1">Попередні</span>
             </Button>
-            <span className="text-sm">
-                Сторінка {currentPage + 1} з {totalPages}
-            </span>
+
+            <div className="text-sm text-muted-foreground text-center tabular-nums min-w-[70px]">
+                <span className="sm:hidden">
+                    {currentPage + 1} / {totalPages}
+                </span>
+                <span className="hidden sm:inline">
+                    Сторінка {currentPage + 1} з {totalPages}
+                </span>
+            </div>
+
             <Button
                 variant="outline"
                 size="sm"
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={currentPage >= totalPages - 1}
+                className="px-2.5 sm:px-3"
             >
-                <span>Наступні</span>
+                <span className="hidden sm:inline sm:mr-1">Наступні</span>
                 <ChevronRight className="h-4 w-4" />
             </Button>
         </div>
@@ -224,8 +233,6 @@ export function CombinedTable({
     const handleCellClick = (studentId: number, lessonId: number) => {
         const grade = getGrade(studentId, lessonId);
         if (!grade) {
-            // If no grade exists, you might want to create a new one.
-            // For now, we just return to avoid errors.
             console.error(`No grade found for student ${studentId} and lesson ${lessonId}`);
             return;
         };
@@ -305,7 +312,7 @@ export function CombinedTable({
                                 <thead>
                                 <tr className="bg-gray-100">
                                     <th className="sticky left-0 bg-gray-100 z-20 px-3 py-3 text-left border-r border-b w-[50px]">
-                                        <div className="text-sm">№</div>
+                                        <div className="text-sm">#</div>
                                     </th>
                                     <th className="sticky left-[50px] bg-gray-100 z-20 px-4 py-3 text-left border-r border-b min-w-[280px]">
                                         <div className="text-sm">Студент</div>
@@ -603,4 +610,3 @@ export function CombinedTable({
         </>
     );
 }
-

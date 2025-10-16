@@ -14,7 +14,7 @@ interface AttendanceGradesTableProps {
     searchQuery: string;
 }
 
-const LESSONS_PER_PAGE = 10;
+const LESSONS_PER_PAGE = 3;
 
 export function AttendanceGradesTable({
                                           students,
