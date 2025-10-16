@@ -1,152 +1,16 @@
-import React, { useState, useMemo, forwardRef } from 'react';
-import { Check, X, Minus, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Check, X, Minus, Plus } from 'lucide-react';
 import { Student, Lesson, Grade } from '@/types';
 
-// --- UI COMPONENT STUBS ---
-// Since the original UI components are not available in this context,
-// we are recreating basic versions of them here.
+// Імпортуємо всі UI компоненти
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './ui/dialog';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { ScrollArea } from './ui/scroll-area';
+import { DatePagination } from './DatePagination';
 
-const Card = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-    <div
-        ref={ref}
-        className={`rounded-lg border bg-card text-card-foreground shadow-sm ${className}`}
-        {...props}
-    />
-));
-Card.displayName = "Card";
-
-const Button = forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'default' | 'outline', size?: 'default' | 'sm' | 'icon' }>(
-    ({ className, variant = 'default', size = 'default', ...props }, ref) => {
-        const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
-        const variantClasses = {
-            default: "bg-primary text-primary-foreground hover:bg-primary/90",
-            outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        };
-        const sizeClasses = {
-            default: "h-10 px-4 py-2",
-            sm: "h-9 rounded-md px-3",
-            icon: "h-10 w-10",
-        };
-        return (
-            <button
-                className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
-                ref={ref}
-                {...props}
-            />
-        );
-    }
-);
-Button.displayName = "Button";
-
-const Input = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(({ className, ...props }, ref) => {
-    return (
-        <input
-            className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
-            ref={ref}
-            {...props}
-        />
-    );
-});
-Input.displayName = "Input";
-
-const Label = forwardRef<HTMLLabelElement, React.LabelHTMLAttributes<HTMLLabelElement>>(({ className, ...props }, ref) => (
-    <label
-        ref={ref}
-        className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className}`}
-        {...props}
-    />
-));
-Label.displayName = "Label";
-
-
-const Dialog = ({ open, onOpenChange, children }: { open: boolean, onOpenChange: (open: boolean) => void, children?: React.ReactNode }) => {
-    if (!open) return null;
-    return (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center" onClick={() => onOpenChange(false)}>
-            {children}
-        </div>
-    );
-};
-
-const DialogContent = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, children, ...props }, ref) => (
-    <div
-        ref={ref}
-        onClick={(e) => e.stopPropagation()}
-        className={`fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg ${className}`}
-        {...props}
-    >
-        {children}
-    </div>
-));
-DialogContent.displayName = "DialogContent";
-
-const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div className={`flex flex-col space-y-1.5 text-center sm:text-left ${className}`} {...props} />
-);
-DialogHeader.displayName = "DialogHeader";
-
-const DialogTitle = forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(({ className, ...props }, ref) => (
-    <h2 ref={ref} className={`text-lg font-semibold leading-none tracking-tight ${className}`} {...props} />
-));
-DialogTitle.displayName = "DialogTitle";
-
-
-const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div className={`flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 ${className}`} {...props} />
-);
-DialogFooter.displayName = "DialogFooter";
-
-const ScrollArea = ({ className, children }: { className?: string, children: React.ReactNode }) => (
-    <div className={`overflow-x-auto ${className}`}>
-        {children}
-    </div>
-);
-
-// --- DATE PAGINATION COMPONENT (ОНОВЛЕНО) ---
-interface DatePaginationProps {
-    currentPage: number;
-    totalPages: number;
-    onPageChange: (page: number) => void;
-}
-
-function DatePagination({ currentPage, totalPages, onPageChange }: DatePaginationProps) {
-    return (
-        <div className="flex items-center justify-center gap-2">
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onPageChange(currentPage - 1)}
-                disabled={currentPage === 0}
-                className="px-2.5 sm:px-3"
-            >
-                <ChevronLeft className="h-4 w-4" />
-                <span className="hidden sm:inline sm:ml-1">Попередні</span>
-            </Button>
-
-            <div className="text-sm text-muted-foreground text-center tabular-nums min-w-[70px]">
-                <span className="sm:hidden">
-                    {currentPage + 1} / {totalPages}
-                </span>
-                <span className="hidden sm:inline">
-                    Сторінка {currentPage + 1} з {totalPages}
-                </span>
-            </div>
-
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onPageChange(currentPage + 1)}
-                disabled={currentPage >= totalPages - 1}
-                className="px-2.5 sm:px-3"
-            >
-                <span className="hidden sm:inline sm:mr-1">Наступні</span>
-                <ChevronRight className="h-4 w-4" />
-            </Button>
-        </div>
-    );
-}
-
-// --- MAIN COMPONENT ---
 interface CombinedTableProps {
     students: Student[];
     lessons: Lesson[];
@@ -172,6 +36,8 @@ export function CombinedTable({
         studentName: string;
         lessonDate: string;
     } | null>(null);
+
+    // State для модального вікна
     const [attended, setAttended] = useState(true);
     const [score, setScore] = useState('');
     const [extraPoints, setExtraPoints] = useState(0);
@@ -185,12 +51,6 @@ export function CombinedTable({
         );
     }, [students, searchQuery]);
 
-    const lessonTypeMap = useMemo(() => {
-        const map = new Map<number, 'lecture' | 'practical'>();
-        lessons.forEach(lesson => map.set(lesson.id, lesson.type));
-        return map;
-    }, [lessons]);
-
     const totalPages = Math.ceil(lessons.length / LESSONS_PER_PAGE);
     const paginatedLessons = lessons.slice(
         currentPage * LESSONS_PER_PAGE,
@@ -202,7 +62,7 @@ export function CombinedTable({
     };
 
     const calculateAttendanceRate = (studentId: number): string => {
-        const studentGrades = grades.filter(g => g.studentId === studentId && lessonTypeMap.get(g.lessonId) === type);
+        const studentGrades = grades.filter(g => g.studentId === studentId && lessons.some(l => l.id === g.lessonId && l.type === type));
         if (studentGrades.length === 0) return '0%';
         const attendedCount = studentGrades.filter(g => g.attended).length;
         return `${Math.round((attendedCount / studentGrades.length) * 100)}%`;
@@ -215,15 +75,13 @@ export function CombinedTable({
     };
 
     const getTotalScore = (studentId: number): number => {
-        const relevantGrades = grades.filter(
-            g => g.studentId === studentId && lessonTypeMap.get(g.lessonId) === type
-        );
-
-        return relevantGrades.reduce((sum, g) => {
-            if (!g.attended) return sum;
-            const baseScore = type === 'lecture' ? 0 : g.score || 0;
-            return sum + baseScore + (g.extraPoints || 0);
-        }, 0);
+        return grades
+            .filter(g => g.studentId === studentId && lessons.some(l => l.id === g.lessonId && l.type === type))
+            .reduce((sum, g) => {
+                if (!g.attended) return sum;
+                const baseScore = type === 'lecture' ? 0 : (g.score || 0);
+                return sum + baseScore + g.extraPoints;
+            }, 0);
     };
 
     const toggleIndividualPlan = (studentId: number) => {
@@ -232,18 +90,18 @@ export function CombinedTable({
 
     const handleCellClick = (studentId: number, lessonId: number) => {
         const grade = getGrade(studentId, lessonId);
-        if (!grade) {
-            console.error(`No grade found for student ${studentId} and lesson ${lessonId}`);
-            return;
-        };
+        if (!grade) return;
+
         const student = students.find(s => s.id === studentId);
         const lesson = lessons.find(l => l.id === lessonId);
+
         if (student && lesson) {
             setEditingCell({
                 grade,
                 studentName: `${student.lastName} ${student.firstName} ${student.patronymic}`,
                 lessonDate: lesson.date,
             });
+            // Ініціалізуємо стан модального вікна даними з оцінки
             setAttended(grade.attended);
             setScore(grade.score !== null ? grade.score.toString() : '');
             setExtraPoints(grade.extraPoints);
@@ -251,29 +109,26 @@ export function CombinedTable({
     };
 
     const handleSave = () => {
-        if (editingCell) {
-            let updatedGrade: Grade;
-            if (!attended) {
-                updatedGrade = {
-                    ...editingCell.grade,
-                    attended: false,
-                    score: null,
-                    extraPoints: 0,
-                };
-            } else {
-                const scoreValue = score === '' ? null : parseInt(score, 10);
-                updatedGrade = {
-                    ...editingCell.grade,
-                    attended: true,
-                    score: type === 'practical' ? scoreValue : null,
-                    extraPoints: extraPoints,
-                };
-            }
-            onGradeUpdate(updatedGrade);
-            setEditingCell(null);
+        if (!editingCell) return;
+
+        let updatedGrade: Grade;
+        if (!attended) {
+            // Якщо студент був відсутній, обнуляємо все
+            updatedGrade = { ...editingCell.grade, attended: false, score: null, extraPoints: 0 };
+        } else {
+            const scoreValue = score === '' ? null : parseInt(score, 10);
+            updatedGrade = {
+                ...editingCell.grade,
+                attended: true,
+                score: type === 'practical' ? scoreValue : null, // Оцінку зберігаємо тільки для практичних
+                extraPoints: extraPoints,
+            };
         }
+        onGradeUpdate(updatedGrade);
+        setEditingCell(null); // Закриваємо модальне вікно
     };
 
+    // Функції-хелпери для модального вікна
     const adjustScore = (delta: number) => {
         const currentScore = score === '' ? 0 : parseInt(score);
         const newScore = Math.max(0, currentScore + delta);
@@ -284,6 +139,7 @@ export function CombinedTable({
         setExtraPoints(Math.max(0, extraPoints + delta));
     };
 
+    // ( ... решта коду рендерингу без змін ... )
     return (
         <>
             <Card className="overflow-hidden">
@@ -305,6 +161,7 @@ export function CombinedTable({
                     </div>
                 </div>
 
+                {/* Desktop Table */}
                 <div className="hidden md:block">
                     <ScrollArea className="w-full">
                         <div className="min-w-max">
@@ -382,33 +239,29 @@ export function CombinedTable({
                                                 >
                                                     {grade && (
                                                         <div className="flex items-center justify-center">
-                                                            {grade.attended ? (
-                                                                type === 'lecture' ? (
-                                                                    grade.extraPoints > 0 ? (
-                                                                        <span className="text-sm text-green-600">
-                                                                            +{grade.extraPoints}
-                                                                         </span>
-                                                                    ) : (
-                                                                        <Check className="h-5 w-5 text-green-500" />
-                                                                    )
-                                                                ) : (
-                                                                    <div className="flex flex-col items-center">
-                                                                        {grade.score !== null ? (
-                                                                            <span className="text-sm">
-                                                                                {grade.score}
-                                                                                {grade.extraPoints > 0 && (
-                                                                                    <span className="text-xs text-green-600 ml-1">
-                                                                                        +{grade.extraPoints}
-                                                                                    </span>
-                                                                                )}
-                                                                            </span>
-                                                                        ) : (
-                                                                            <Check className="h-5 w-5 text-green-500" />
-                                                                        )}
-                                                                    </div>
-                                                                )
-                                                            ) : (
+                                                            {!grade.attended ? (
                                                                 <X className="h-5 w-5 text-red-500" />
+                                                            ) : type === 'lecture' ? (
+                                                                grade.extraPoints > 0 ? (
+                                                                    <span className="text-sm font-semibold text-green-600">
+                                                                        +{grade.extraPoints}
+                                                                     </span>
+                                                                ) : (
+                                                                    <Check className="h-5 w-5 text-green-500" />
+                                                                )
+                                                            ) : ( // type === 'practical'
+                                                                grade.score !== null ? (
+                                                                    <span className="text-sm font-semibold">
+                                                                        {grade.score}
+                                                                        {grade.extraPoints > 0 && (
+                                                                            <span className="text-xs text-green-600 ml-1">
+                                                                                +{grade.extraPoints}
+                                                                            </span>
+                                                                        )}
+                                                                    </span>
+                                                                ) : (
+                                                                    <Check className="h-5 w-5 text-green-500" />
+                                                                )
                                                             )}
                                                         </div>
                                                     )}
@@ -416,7 +269,7 @@ export function CombinedTable({
                                             );
                                         })}
                                         <td className={`sticky right-0 z-10 px-4 py-3 border-l text-center min-w-[120px] shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.1)] ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                                            <div className={`text-sm ${
+                                            <div className={`text-sm font-semibold ${
                                                 parseInt(calculateAttendanceRate(student.id)) >= 80
                                                     ? 'text-green-600'
                                                     : parseInt(calculateAttendanceRate(student.id)) >= 60
@@ -457,7 +310,6 @@ export function CombinedTable({
                                     </div>
                                 </div>
                             </div>
-
                             <ScrollArea className="w-full">
                                 <div className="flex gap-2 pb-2">
                                     {paginatedLessons.map((lesson) => {
@@ -473,38 +325,32 @@ export function CombinedTable({
                                                 </div>
                                                 <div className="flex-grow flex items-center justify-center">
                                                     {grade ? (
-                                                        <>
-                                                            {grade.attended ? (
-                                                                type === 'lecture' ? (
-                                                                    grade.extraPoints > 0 ? (
-                                                                        <span className="text-sm font-bold text-green-600">
-                                                                            +{grade.extraPoints}
-                                                                         </span>
-                                                                    ) : (
-                                                                        <Check className="h-5 w-5 text-green-500" />
-                                                                    )
-                                                                ) : (
-                                                                    <div className="flex flex-col items-center">
-                                                                        {grade.score !== null ? (
-                                                                            <span className="text-sm font-bold">
-                                                                                {grade.score}
-                                                                                {grade.extraPoints > 0 && (
-                                                                                    <span className="text-xs text-green-600 ml-1">
-                                                                                        +{grade.extraPoints}
-                                                                                    </span>
-                                                                                )}
-                                                                            </span>
-                                                                        ) : (
-                                                                            <Check className="h-5 w-5 text-green-500" />
-                                                                        )}
-                                                                    </div>
-                                                                )
+                                                        !grade.attended ? (
+                                                            <X className="h-5 w-5 text-red-500" />
+                                                        ) : type === 'lecture' ? (
+                                                            grade.extraPoints > 0 ? (
+                                                                <span className="text-sm font-bold text-green-600">
+                                                                    +{grade.extraPoints}
+                                                                 </span>
                                                             ) : (
-                                                                <X className="h-5 w-5 text-red-500" />
-                                                            )}
-                                                        </>
+                                                                <Check className="h-5 w-5 text-green-500" />
+                                                            )
+                                                        ) : ( // type === 'practical'
+                                                            grade.score !== null ? (
+                                                                <span className="text-sm font-bold">
+                                                                    {grade.score}
+                                                                    {grade.extraPoints > 0 && (
+                                                                        <span className="text-xs text-green-600 ml-1">
+                                                                            +{grade.extraPoints}
+                                                                        </span>
+                                                                    )}
+                                                                </span>
+                                                            ) : (
+                                                                <Check className="h-5 w-5 text-green-500" />
+                                                            )
+                                                        )
                                                     ) : (
-                                                        <span className="text-xs text-gray-400">немає даних</span>
+                                                        <span className="text-xs text-gray-400">-</span>
                                                     )}
                                                 </div>
                                             </button>
@@ -517,12 +363,11 @@ export function CombinedTable({
                 </div>
             </Card>
 
+            {/* Edit Dialog */}
             <Dialog open={editingCell !== null} onOpenChange={() => setEditingCell(null)}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>
-                            Редагування даних
-                        </DialogTitle>
+                        <DialogTitle>Редагування даних</DialogTitle>
                         <p className="text-sm text-gray-500 mt-2">
                             {editingCell?.studentName} - {editingCell?.lessonDate}
                         </p>
@@ -555,14 +400,14 @@ export function CombinedTable({
                                                 value={score}
                                                 onChange={(e) => setScore(e.target.value)}
                                                 className="text-center"
-                                                placeholder="Введіть оцінку"
+                                                placeholder="-"
                                             />
                                             <Button type="button" variant="outline" size="icon" onClick={() => adjustScore(1)}>
                                                 <Plus className="h-4 w-4" />
                                             </Button>
                                         </div>
-                                        <div className="flex flex-wrap gap-2 mt-2">
-                                            {[0, 5, 6, 7, 8, 9, 10, 12, 15, 20].map((value) => (
+                                        <div className="flex flex-wrap gap-2 pt-2">
+                                            {[5, 6, 7, 8, 9, 10, 12, 15, 20].map((value) => (
                                                 <Button
                                                     key={value}
                                                     type="button"

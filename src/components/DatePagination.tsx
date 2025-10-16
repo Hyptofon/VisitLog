@@ -10,7 +10,6 @@ interface DatePaginationProps {
 export function DatePagination({ currentPage, totalPages, onPageChange }: DatePaginationProps) {
     return (
         <div className="flex items-center justify-center gap-2">
-            {/* Кнопка "Назад" */}
             <Button
                 variant="outline"
                 size="sm"

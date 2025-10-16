@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { ArrowLeft, Download, FileSpreadsheet, Menu } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card } from './components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs'; // Припустимо, що у вас є цей компонент
+import { Sheet, SheetContent, SheetTrigger } from './components/ui/sheet'; // і цей
 import { CombinedTable } from './components/CombinedTable';
 import { StatsCards } from './components/StatsCards';
 import { SearchBar } from './components/SearchBar';
 import { students, lessons, initialGrades } from './data/mockData';
 import { Grade } from './types';
 import { exportToExcel, exportToPDF } from './utils/exportUtils';
-import { toast } from 'sonner';
-import { Sheet, SheetContent, SheetTrigger } from './components/ui/sheet';
+import { toast } from 'sonner'; // Припустимо, що використовуєте 'sonner' для сповіщень
 
 export default function App() {
     const [selectedType, setSelectedType] = useState<'lecture' | 'practical' | null>(null);
@@ -22,7 +22,7 @@ export default function App() {
     const handleGradeUpdate = (updatedGrade: Grade) => {
         setGrades(prevGrades =>
             prevGrades.map(g =>
-                g.studentId === updatedGrade.studentId && g.lessonId === updatedGrade.lessonId
+                (g.studentId === updatedGrade.studentId && g.lessonId === updatedGrade.lessonId)
                     ? updatedGrade
                     : g
             )
@@ -31,21 +31,22 @@ export default function App() {
     };
 
     const handleExportExcel = () => {
-        exportToExcel(students, lessons, grades, activeTab);
+        exportToExcel(students, lessons.filter(l => l.type === activeTab), grades, activeTab);
         toast.success('Експортовано в Excel');
     };
 
     const handleExportPDF = () => {
-        exportToPDF(students, lessons, grades, activeTab);
+        exportToPDF(students, lessons.filter(l => l.type === activeTab), grades, activeTab);
         toast.success('Підготовлено до друку');
     };
 
+    // Screen for choosing lesson type
     if (!selectedType) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
                 <Card className="max-w-2xl w-full p-6 md:p-8">
                     <div className="text-center mb-6 md:mb-8">
-                        <h1 className="mb-2 text-xl md:text-2xl">Журнал відвідувань</h1>
+                        <h1 className="mb-2 text-xl md:text-2xl font-bold">Журнал відвідувань</h1>
                         <p className="text-sm md:text-base text-muted-foreground">
                             Web-дизайн та Web-програмування
                         </p>
@@ -63,33 +64,27 @@ export default function App() {
                         </p>
 
                         <Button
-                            onClick={() => {
-                                setSelectedType('lecture');
-                                setActiveTab('lecture');
-                            }}
+                            onClick={() => { setSelectedType('lecture'); setActiveTab('lecture'); }}
                             className="w-full h-auto py-4 md:py-6"
                             size="lg"
                         >
                             <div className="text-left w-full">
-                                <div className="text-base md:text-lg mb-1">📚 Лекції</div>
-                                <div className="text-xs md:text-sm opacity-80">
+                                <div className="text-base md:text-lg font-semibold mb-1">📚 Лекції</div>
+                                <div className="text-xs md:text-sm opacity-80 font-normal">
                                     Теоретичний матеріал та основні концепції
                                 </div>
                             </div>
                         </Button>
 
                         <Button
-                            onClick={() => {
-                                setSelectedType('practical');
-                                setActiveTab('practical');
-                            }}
+                            onClick={() => { setSelectedType('practical'); setActiveTab('practical'); }}
                             className="w-full h-auto py-4 md:py-6"
                             size="lg"
                             variant="secondary"
                         >
                             <div className="text-left w-full">
-                                <div className="text-base md:text-lg mb-1">💻 Практичні</div>
-                                <div className="text-xs md:text-sm opacity-80">
+                                <div className="text-base md:text-lg font-semibold mb-1">💻 Практичні</div>
+                                <div className="text-xs md:text-sm opacity-80 font-normal">
                                     Практичні завдання та лабораторні роботи
                                 </div>
                             </div>
@@ -105,34 +100,25 @@ export default function App() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="bg-white border-b sticky top-0 z-30 shadow-sm">
+            <header className="bg-white border-b sticky top-0 z-30 shadow-sm">
                 <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
                     {/* Mobile Header */}
                     <div className="md:hidden">
                         <div className="flex items-center justify-between mb-3">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setSelectedType(null)}
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => setSelectedType(null)}>
                                 <ArrowLeft className="h-4 w-4" />
                             </Button>
-                            <h1 className="text-sm">Журнал відвідувань</h1>
+                            <h1 className="text-sm font-semibold">Журнал</h1>
                             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                                 <SheetTrigger asChild>
-                                    <Button variant="ghost" size="sm">
-                                        <Menu className="h-4 w-4" />
-                                    </Button>
+                                    <Button variant="ghost" size="sm"><Menu className="h-4 w-4" /></Button>
                                 </SheetTrigger>
                                 <SheetContent side="right">
                                     <div className="mt-6 space-y-4">
                                         <Button
                                             variant="outline"
                                             className="w-full justify-start"
-                                            onClick={() => {
-                                                handleExportExcel();
-                                                setMobileMenuOpen(false);
-                                            }}
+                                            onClick={() => { handleExportExcel(); setMobileMenuOpen(false); }}
                                         >
                                             <FileSpreadsheet className="h-4 w-4 mr-2" />
                                             Експорт в Excel
@@ -140,10 +126,7 @@ export default function App() {
                                         <Button
                                             variant="outline"
                                             className="w-full justify-start"
-                                            onClick={() => {
-                                                handleExportPDF();
-                                                setMobileMenuOpen(false);
-                                            }}
+                                            onClick={() => { handleExportPDF(); setMobileMenuOpen(false); }}
                                         >
                                             <Download className="h-4 w-4 mr-2" />
                                             Експорт в PDF
@@ -152,7 +135,6 @@ export default function App() {
                                 </SheetContent>
                             </Sheet>
                         </div>
-
                         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'lecture' | 'practical')} className="mb-3">
                             <TabsList className="w-full">
                                 <TabsTrigger value="lecture" className="flex-1 text-xs">
@@ -163,7 +145,6 @@ export default function App() {
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
-
                         <SearchBar value={searchQuery} onChange={setSearchQuery} />
                     </div>
 
@@ -171,62 +152,45 @@ export default function App() {
                     <div className="hidden md:block">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-4">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setSelectedType(null)}
-                                >
+                                <Button variant="ghost" size="sm" onClick={() => setSelectedType(null)}>
                                     <ArrowLeft className="h-4 w-4 mr-2" />
                                     Назад
                                 </Button>
                                 <div>
-                                    <h1 className="text-base lg:text-lg">Журнал відвідувань - Web-дизайн та Web-програмування</h1>
-                                    <p className="text-xs lg:text-sm text-muted-foreground">
-                                        Викладач: Зубенко Ігор Ростиславович
-                                    </p>
+                                    <h1 className="text-base lg:text-lg font-semibold">Журнал відвідувань - Web-дизайн та Web-програмування</h1>
+                                    <p className="text-xs lg:text-sm text-muted-foreground">Викладач: Зубенко Ігор Ростиславович</p>
                                 </div>
                             </div>
-
                             <div className="flex gap-2">
                                 <Button variant="outline" size="sm" onClick={handleExportExcel}>
-                                    <FileSpreadsheet className="h-4 w-4 mr-2" />
-                                    Excel
+                                    <FileSpreadsheet className="h-4 w-4 mr-2" /> Excel
                                 </Button>
                                 <Button variant="outline" size="sm" onClick={handleExportPDF}>
-                                    <Download className="h-4 w-4 mr-2" />
-                                    PDF
+                                    <Download className="h-4 w-4 mr-2" /> PDF
                                 </Button>
                             </div>
                         </div>
-
                         <div className="flex items-center justify-between">
                             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'lecture' | 'practical')}>
                                 <TabsList>
-                                    <TabsTrigger value="lecture">
-                                        📚 Лекції
-                                    </TabsTrigger>
-                                    <TabsTrigger value="practical">
-                                        💻 Практичні
-                                    </TabsTrigger>
+                                    <TabsTrigger value="lecture">📚 Лекції</TabsTrigger>
+                                    <TabsTrigger value="practical">💻 Практичні</TabsTrigger>
                                 </TabsList>
                             </Tabs>
-
                             <SearchBar value={searchQuery} onChange={setSearchQuery} />
                         </div>
                     </div>
                 </div>
-            </div>
+            </header>
 
             {/* Main Content */}
-            <div className="container mx-auto px-3 md:px-4 py-4 md:py-6">
+            <main className="container mx-auto px-3 md:px-4 py-4 md:py-6">
                 <StatsCards
                     grades={grades}
                     lessons={filteredLessons}
                     studentCount={students.length}
                     type={activeTab}
-                    mode={activeTab === 'lecture' ? 'attendance' : 'grades'}
                 />
-
                 <CombinedTable
                     students={students}
                     lessons={filteredLessons}
@@ -235,7 +199,7 @@ export default function App() {
                     searchQuery={searchQuery}
                     type={activeTab}
                 />
-            </div>
+            </main>
         </div>
     );
 }
