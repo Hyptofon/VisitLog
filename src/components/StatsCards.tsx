@@ -6,7 +6,7 @@ interface StatsCardsProps {
     grades: Grade[];
     lessons: Lesson[];
     studentCount: number;
-    type: 'lecture' | 'practical';
+    type: 'lecture' | 'practical' | 'laboratory';
 }
 
 export function StatsCards({ grades, lessons, studentCount, type }: StatsCardsProps) {
@@ -54,7 +54,7 @@ export function StatsCards({ grades, lessons, studentCount, type }: StatsCardsPr
         );
     }
 
-    // Інакше (для практичних), показуємо статистику оцінок
+
     else {
         const totalSumOfScores = relevantGrades.reduce((sum, g) => {
             if (g.attended) {

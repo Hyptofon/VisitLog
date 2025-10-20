@@ -2,21 +2,21 @@ import { useState } from 'react';
 import { ArrowLeft, Download, FileSpreadsheet, Menu } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card } from './components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs'; // Припустимо, що у вас є цей компонент
-import { Sheet, SheetContent, SheetTrigger } from './components/ui/sheet'; // і цей
+import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs';
+import { Sheet, SheetContent, SheetTrigger } from './components/ui/sheet';
 import { CombinedTable } from './components/CombinedTable';
 import { StatsCards } from './components/StatsCards';
 import { SearchBar } from './components/SearchBar';
 import { students, lessons, initialGrades } from './data/mockData';
 import { Grade } from './types';
 import { exportToExcel, exportToPDF } from './utils/exportUtils';
-import { toast } from 'sonner'; // Припустимо, що використовуєте 'sonner' для сповіщень
+import { toast, Toaster } from 'sonner';
 
 export default function App() {
-    const [selectedType, setSelectedType] = useState<'lecture' | 'practical' | null>(null);
+    const [selectedType, setSelectedType] = useState<'lecture' | 'practical' | 'laboratory' | null>(null);
     const [grades, setGrades] = useState<Grade[]>(initialGrades);
     const [searchQuery, setSearchQuery] = useState('');
-    const [activeTab, setActiveTab] = useState<'lecture' | 'practical'>('lecture');
+    const [activeTab, setActiveTab] = useState<'lecture' | 'practical' | 'laboratory'>('lecture');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const handleGradeUpdate = (updatedGrade: Grade) => {
@@ -27,23 +27,22 @@ export default function App() {
                     : g
             )
         );
-        toast.success('Оновлено успішно');
     };
 
     const handleExportExcel = () => {
         exportToExcel(students, lessons.filter(l => l.type === activeTab), grades, activeTab);
-        toast.success('Експортовано в Excel');
+        toast.success('📊 Дані успішно експортовано в Excel', { duration: 3000 });
     };
 
     const handleExportPDF = () => {
         exportToPDF(students, lessons.filter(l => l.type === activeTab), grades, activeTab);
-        toast.success('Підготовлено до друку');
+        toast.success('📄 Документ підготовлено до друку', { duration: 3000 });
     };
 
-    // Screen for choosing lesson type
     if (!selectedType) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+                <Toaster position="top-right" expand={true} richColors />
                 <Card className="max-w-2xl w-full p-6 md:p-8">
                     <div className="text-center mb-6 md:mb-8">
                         <h1 className="mb-2 text-xl md:text-2xl font-bold">Журнал відвідувань</h1>
@@ -65,7 +64,7 @@ export default function App() {
 
                         <Button
                             onClick={() => { setSelectedType('lecture'); setActiveTab('lecture'); }}
-                            className="w-full h-auto py-4 md:py-6"
+                            className="w-full h-auto py-4 md:py-6 bg-green-400 hover:bg-green-500"
                             size="lg"
                         >
                             <div className="text-left w-full">
@@ -78,14 +77,26 @@ export default function App() {
 
                         <Button
                             onClick={() => { setSelectedType('practical'); setActiveTab('practical'); }}
-                            className="w-full h-auto py-4 md:py-6"
+                            className="w-full h-auto py-4 md:py-6 bg-blue-400 hover:bg-blue-500"
                             size="lg"
-                            variant="secondary"
                         >
                             <div className="text-left w-full">
                                 <div className="text-base md:text-lg font-semibold mb-1">💻 Практичні</div>
                                 <div className="text-xs md:text-sm opacity-80 font-normal">
-                                    Практичні завдання та лабораторні роботи
+                                    Практичні завдання
+                                </div>
+                            </div>
+                        </Button>
+
+                        <Button
+                            onClick={() => { setSelectedType('laboratory'); setActiveTab('laboratory'); }}
+                            className="w-full h-auto py-4 md:py-6 bg-purple-400 hover:bg-purple-500"
+                            size="lg"
+                        >
+                            <div className="text-left w-full">
+                                <div className="text-base md:text-lg font-semibold mb-1">🔬 Лабораторні</div>
+                                <div className="text-xs md:text-sm opacity-80 font-normal">
+                                    Лабораторні роботи та дослідження
                                 </div>
                             </div>
                         </Button>
@@ -99,10 +110,9 @@ export default function App() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Header */}
+            <Toaster position="top-right" expand={true} richColors />
             <header className="bg-white border-b sticky top-0 z-30 shadow-sm">
                 <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
-                    {/* Mobile Header */}
                     <div className="md:hidden">
                         <div className="flex items-center justify-between mb-3">
                             <Button variant="ghost" size="sm" onClick={() => setSelectedType(null)}>
@@ -135,20 +145,22 @@ export default function App() {
                                 </SheetContent>
                             </Sheet>
                         </div>
-                        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'lecture' | 'practical')} className="mb-3">
-                            <TabsList className="w-full">
-                                <TabsTrigger value="lecture" className="flex-1 text-xs">
-                                    📚 Лекції ({lessons.filter(l => l.type === 'lecture').length})
+                        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'lecture' | 'practical' | 'laboratory')} className="mb-3">
+                            <TabsList className="w-full grid grid-cols-3">
+                                <TabsTrigger value="lecture" className="text-xs">
+                                    📚 Лекції
                                 </TabsTrigger>
-                                <TabsTrigger value="practical" className="flex-1 text-xs">
-                                    💻 Практичні ({lessons.filter(l => l.type === 'practical').length})
+                                <TabsTrigger value="practical" className="text-xs">
+                                    💻 Практичні
+                                </TabsTrigger>
+                                <TabsTrigger value="laboratory" className="text-xs">
+                                    🔬 Лабораторні
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
                         <SearchBar value={searchQuery} onChange={setSearchQuery} />
                     </div>
 
-                    {/* Desktop Header */}
                     <div className="hidden md:block">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-4">
@@ -171,10 +183,11 @@ export default function App() {
                             </div>
                         </div>
                         <div className="flex items-center justify-between">
-                            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'lecture' | 'practical')}>
+                            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'lecture' | 'practical' | 'laboratory')}>
                                 <TabsList>
                                     <TabsTrigger value="lecture">📚 Лекції</TabsTrigger>
                                     <TabsTrigger value="practical">💻 Практичні</TabsTrigger>
+                                    <TabsTrigger value="laboratory">🔬 Лабораторні</TabsTrigger>
                                 </TabsList>
                             </Tabs>
                             <SearchBar value={searchQuery} onChange={setSearchQuery} />
@@ -183,7 +196,6 @@ export default function App() {
                 </div>
             </header>
 
-            {/* Main Content */}
             <main className="container mx-auto px-3 md:px-4 py-4 md:py-6">
                 <StatsCards
                     grades={grades}

@@ -8,7 +8,7 @@ export interface Student {
 export interface Lesson {
     id: number;
     date: string;
-    type: 'lecture' | 'practical';
+    type: 'lecture' | 'practical' | 'laboratory';
     number: number;
 }
 
@@ -25,4 +25,26 @@ export interface StudentStats {
     averageGrade: number;
     attendanceRate: number;
     totalAbsences: number;
+}
+
+export interface GradeHistory {
+    timestamp: string;
+    oldValue: {
+        attended: boolean;
+        score: number | null;
+        comment?: string;
+    };
+    newValue: {
+        attended: boolean;
+        score: number | null;
+        comment?: string;
+    };
+    changedBy: string;
+}
+
+export interface StudentNote {
+    id: number;
+    text: string;
+    timestamp: string;
+    author: string;
 }

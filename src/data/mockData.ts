@@ -59,30 +59,29 @@ export const lessons: Lesson[] = [
     { id: 2, date: '18.09.2025', type: 'lecture', number: 2 },
     { id: 3, date: '23.09.2025', type: 'practical', number: 1 },
     { id: 4, date: '25.09.2025', type: 'lecture', number: 3 },
-    { id: 5, date: '30.09.2025', type: 'practical', number: 2 },
+    { id: 5, date: '30.09.2025', type: 'laboratory', number: 1 }, // Додано лабораторну
     { id: 6, date: '02.10.2025', type: 'lecture', number: 4 },
     { id: 7, date: '07.10.2025', type: 'practical', number: 3 },
     { id: 8, date: '09.10.2025', type: 'lecture', number: 5 },
-    { id: 9, date: '14.10.2025', type: 'practical', number: 4 },
+    { id: 9, date: '14.10.2025', type: 'laboratory', number: 2 }, // Додано лабораторну
     { id: 10, date: '16.10.2025', type: 'lecture', number: 6 },
     { id: 11, date: '21.10.2025', type: 'practical', number: 5 },
     { id: 12, date: '23.10.2025', type: 'lecture', number: 7 },
-    { id: 13, date: '28.10.2025', type: 'practical', number: 6 },
+    { id: 13, date: '28.10.2025', type: 'laboratory', number: 3 }, // Додано лабораторну
     { id: 14, date: '30.10.2025', type: 'lecture', number: 8 },
     { id: 15, date: '04.11.2025', type: 'practical', number: 7 },
     { id: 16, date: '06.11.2025', type: 'lecture', number: 9 },
-    { id: 17, date: '11.11.2025', type: 'practical', number: 8 },
+    { id: 17, date: '11.11.2025', type: 'laboratory', number: 4 }, // Додано лабораторну
     { id: 18, date: '13.11.2025', type: 'lecture', number: 10 },
     { id: 19, date: '18.11.2025', type: 'practical', number: 9 },
     { id: 20, date: '20.11.2025', type: 'lecture', number: 11 },
-    { id: 21, date: '25.11.2025', type: 'practical', number: 10 },
+    { id: 21, date: '25.11.2025', type: 'laboratory', number: 5 }, // Додано лабораторну
     { id: 22, date: '27.11.2025', type: 'lecture', number: 12 },
     { id: 23, date: '02.12.2025', type: 'practical', number: 11 },
     { id: 24, date: '04.12.2025', type: 'lecture', number: 13 },
-    { id: 25, date: '09.12.2025', type: 'practical', number: 12 },
+    { id: 25, date: '09.12.2025', type: 'laboratory', number: 6 }, // Додано лабораторну
 ];
 
-// Generate realistic grades data
 function generateGrades(): Grade[] {
     const grades: Grade[] = [];
 
@@ -94,7 +93,7 @@ function generateGrades(): Grade[] {
 
             // Score between 0-10 if attended, null if not
             let score = null;
-            if (attended) {
+            if (attended && (lesson.type === 'practical' || lesson.type === 'laboratory')) {
                 // Most scores between 5-9
                 const scoreRandom = Math.random();
                 if (scoreRandom < 0.05) {
