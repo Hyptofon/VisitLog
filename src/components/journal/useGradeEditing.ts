@@ -32,7 +32,7 @@ export const useGradeEditing = ({ onGradeUpdate, addToHistory }: UseGradeEditing
 
     const handleCloseDialog = () => {
         setEditingCell(null);
-        setComment(''); // Скидаємо коментар при закритті
+        setComment('');
     };
 
     const handleSave = () => {
@@ -42,8 +42,6 @@ export const useGradeEditing = ({ onGradeUpdate, addToHistory }: UseGradeEditing
         const oldGrade = editingCell.grade;
         const studentName = `${editingCell.student.lastName} ${editingCell.student.firstName}`;
 
-        // --- ВАША ПЕРЕВІРКА ---
-        // Нормалізуємо старий коментар (undefined/null стає порожнім рядком)
         const oldComment = (oldGrade as any).comment || '';
 
         const hasChanged =
@@ -51,24 +49,20 @@ export const useGradeEditing = ({ onGradeUpdate, addToHistory }: UseGradeEditing
             oldGrade.score !== scoreValue ||
             oldComment !== comment;
 
-        // Якщо нічого не змінилося, просто закриваємо діалог і нічого не робимо
         if (!hasChanged) {
             handleCloseDialog();
             return;
         }
-        // --- КІНЕЦЬ ПЕРЕВІРКИ ---
 
         const updatedGrade: Grade = {
             ...oldGrade,
             attended: attended,
             score: scoreValue,
             ...(comment && { comment })
-        } as any; // `as any` через `comment`
+        } as any;
 
-        // Викликаємо історію та оновлення ЛИШЕ ЯКЩО були зміни
         addToHistory(updatedGrade, oldGrade);
 
-        // Логіка сповіщень
         let message = '';
         if (!attended && scoreValue !== null) {
             message = `️ ${studentName} - відсутній, але оцінка ${scoreValue} збережена`;

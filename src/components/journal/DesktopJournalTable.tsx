@@ -12,8 +12,8 @@ interface DesktopJournalTableProps {
     studentNotes: Record<number, StudentNote[]>;
     individualPlans: Record<number, boolean>;
     gradeHistory: Record<string, GradeHistory[]>;
-    fullGrades: Grade[]; // Для розрахунків
-    fullLessons: Lesson[]; // Для розрахунків
+    fullGrades: Grade[];
+    fullLessons: Lesson[];
     onCellClick: (student: Student, lesson: Lesson, grade: Grade) => void;
     onShowNotes: (studentId: number) => void;
     onToggleIndividualPlan: (studentId: number) => void;

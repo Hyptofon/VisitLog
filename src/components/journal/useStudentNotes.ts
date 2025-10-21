@@ -13,7 +13,7 @@ export const useStudentNotes = (students: Student[]) => {
             id: Date.now(),
             text,
             timestamp: new Date().toLocaleString('uk-UA'),
-            author: 'Зубенко Ігор Ростиславович' // Замінити на реального автора
+            author: 'Зубенко Ігор Ростиславович'
         };
 
         setStudentNotes(prev => ({

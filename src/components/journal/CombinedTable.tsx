@@ -1,9 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Student, Lesson, Grade } from '@/types';
 import { Card } from '../ui/card';
-import { DatePagination } from '../DatePagination'; // (Шлях може бути '../DatePagination')
-
-// Імпорт нових частин
+import { DatePagination } from '../DatePagination';
 import { getHeaderColor } from './utils';
 import { useIndividualPlans } from './useIndividualPlans';
 import { useGradeHistory } from './useGradeHistory';
@@ -35,10 +33,8 @@ export function CombinedTable({
                                   type,
                               }: CombinedTableProps) {
 
-    // --- Стан пагінації ---
     const [currentPage, setCurrentPage] = useState(0);
 
-    // --- Фільтрація та пагінація ---
     const filteredStudents = useMemo(() => {
         if (!searchQuery) return students;
         const query = searchQuery.toLowerCase();
@@ -53,7 +49,6 @@ export function CombinedTable({
         (currentPage + 1) * LESSONS_PER_PAGE
     );
 
-    // --- Кастомні хуки для логіки ---
     const { individualPlans, toggleIndividualPlan } = useIndividualPlans(students);
 
     const {
@@ -87,7 +82,6 @@ export function CombinedTable({
         adjustScore
     } = useGradeEditing({ onGradeUpdate, addToHistory });
 
-    // --- Допоміжні функції ---
     const getGrade = useCallback((studentId: number, lessonId: number): Grade | undefined => {
         return grades.find(g => g.studentId === studentId && g.lessonId === lessonId);
     }, [grades]);
@@ -110,9 +104,6 @@ export function CombinedTable({
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
                             <h3 className="text-lg font-semibold">{getTitle()}</h3>
-                            <p className="text-sm text-gray-600 mt-1">
-                                Натисніть на комірку для редагування • Коментарі • Примітки • Історія
-                            </p>
                         </div>
                         <DatePagination
                             currentPage={currentPage}
@@ -150,8 +141,6 @@ export function CombinedTable({
                     onShowNotes={setShowNotesDialog}
                 />
             </Card>
-
-            {/* --- Модальні вікна --- */}
 
             <EditGradeDialog
                 editingCell={editingCell}

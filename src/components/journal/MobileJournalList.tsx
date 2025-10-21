@@ -9,8 +9,8 @@ interface MobileJournalListProps {
     students: Student[];
     lessons: Lesson[];
     getGrade: (studentId: number, lessonId: number) => Grade | undefined;
-    fullGrades: Grade[]; // Для розрахунків
-    fullLessons: Lesson[]; // Для розрахунків
+    fullGrades: Grade[];
+    fullLessons: Lesson[];
     onCellClick: (student: Student, lesson: Lesson, grade: Grade) => void;
     onShowNotes: (studentId: number) => void;
 }

@@ -31,8 +31,6 @@ export const getTotalScore = (
         .reduce((sum, g) => sum + (g.score || 0), 0);
 };
 
-// --- Функції для кольорів ---
-
 export const getHeaderColor = (type: string) => {
     switch(type) {
         case 'lecture': return 'bg-green-100';

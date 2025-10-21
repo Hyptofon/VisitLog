@@ -20,7 +20,7 @@ export const useGradeHistory = () => {
                 score: grade.score,
                 comment: (grade as any).comment
             },
-            changedBy: 'Викладач' // Можна замінити на реального користувача
+            changedBy: 'Зубенко Ігор Ростиславович'
         };
 
         setGradeHistory(prev => ({
