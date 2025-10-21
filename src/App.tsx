@@ -4,8 +4,8 @@ import { Button } from './components/ui/button';
 import { Card } from './components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Sheet, SheetContent, SheetTrigger } from './components/ui/sheet';
-import { CombinedTable } from './components/CombinedTable';
-import { StatsCards } from './components/StatsCards';
+import { CombinedTable } from './components/journal/CombinedTable';
+import { StatsCards } from './components/StatsCards'
 import { SearchBar } from './components/SearchBar';
 import { students, lessons, initialGrades } from './data/mockData';
 import { Grade } from './types';
@@ -31,12 +31,12 @@ export default function App() {
 
     const handleExportExcel = () => {
         exportToExcel(students, lessons.filter(l => l.type === activeTab), grades, activeTab);
-        toast.success('📊 Дані успішно експортовано в Excel', { duration: 3000 });
+        toast.success('Дані успішно експортовано в Excel', { duration: 3000 });
     };
 
     const handleExportPDF = () => {
         exportToPDF(students, lessons.filter(l => l.type === activeTab), grades, activeTab);
-        toast.success('📄 Документ підготовлено до друку', { duration: 3000 });
+        toast.success('Документ підготовлено до друку', { duration: 3000 });
     };
 
     if (!selectedType) {
@@ -68,7 +68,7 @@ export default function App() {
                             size="lg"
                         >
                             <div className="text-left w-full">
-                                <div className="text-base md:text-lg font-semibold mb-1">📚 Лекції</div>
+                                <div className="text-base md:text-lg font-semibold mb-1"> Лекції</div>
                                 <div className="text-xs md:text-sm opacity-80 font-normal">
                                     Теоретичний матеріал та основні концепції
                                 </div>
@@ -81,7 +81,7 @@ export default function App() {
                             size="lg"
                         >
                             <div className="text-left w-full">
-                                <div className="text-base md:text-lg font-semibold mb-1">💻 Практичні</div>
+                                <div className="text-base md:text-lg font-semibold mb-1">Практичні</div>
                                 <div className="text-xs md:text-sm opacity-80 font-normal">
                                     Практичні завдання
                                 </div>
@@ -94,7 +94,7 @@ export default function App() {
                             size="lg"
                         >
                             <div className="text-left w-full">
-                                <div className="text-base md:text-lg font-semibold mb-1">🔬 Лабораторні</div>
+                                <div className="text-base md:text-lg font-semibold mb-1">Лабораторні</div>
                                 <div className="text-xs md:text-sm opacity-80 font-normal">
                                     Лабораторні роботи та дослідження
                                 </div>
@@ -148,13 +148,13 @@ export default function App() {
                         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'lecture' | 'practical' | 'laboratory')} className="mb-3">
                             <TabsList className="w-full grid grid-cols-3">
                                 <TabsTrigger value="lecture" className="text-xs">
-                                    📚 Лекції
+                                    Лекції
                                 </TabsTrigger>
                                 <TabsTrigger value="practical" className="text-xs">
-                                    💻 Практичні
+                                    Практичні
                                 </TabsTrigger>
                                 <TabsTrigger value="laboratory" className="text-xs">
-                                    🔬 Лабораторні
+                                    Лабораторні
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
@@ -185,9 +185,9 @@ export default function App() {
                         <div className="flex items-center justify-between">
                             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'lecture' | 'practical' | 'laboratory')}>
                                 <TabsList>
-                                    <TabsTrigger value="lecture">📚 Лекції</TabsTrigger>
-                                    <TabsTrigger value="practical">💻 Практичні</TabsTrigger>
-                                    <TabsTrigger value="laboratory">🔬 Лабораторні</TabsTrigger>
+                                    <TabsTrigger value="lecture">Лекції</TabsTrigger>
+                                    <TabsTrigger value="practical">Практичні</TabsTrigger>
+                                    <TabsTrigger value="laboratory">Лабораторні</TabsTrigger>
                                 </TabsList>
                             </Tabs>
                             <SearchBar value={searchQuery} onChange={setSearchQuery} />
