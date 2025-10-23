@@ -10,10 +10,9 @@ interface EditingCell {
 
 interface UseGradeEditingProps {
     onGradeUpdate: (grade: Grade) => void;
-    addToHistory: (newGrade: Grade, oldGrade: Grade) => void;
 }
 
-export const useGradeEditing = ({ onGradeUpdate, addToHistory }: UseGradeEditingProps) => {
+export const useGradeEditing = ({ onGradeUpdate }: UseGradeEditingProps) => {
     const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
     const [attended, setAttended] = useState(true);
     const [score, setScore] = useState('');
@@ -41,7 +40,6 @@ export const useGradeEditing = ({ onGradeUpdate, addToHistory }: UseGradeEditing
         const scoreValue = score === '' ? null : parseFloat(score);
         const oldGrade = editingCell.grade;
         const studentName = `${editingCell.student.lastName} ${editingCell.student.firstName}`;
-
         const oldComment = (oldGrade as any).comment || '';
 
         const hasChanged =
@@ -60,8 +58,6 @@ export const useGradeEditing = ({ onGradeUpdate, addToHistory }: UseGradeEditing
             score: scoreValue,
             ...(comment && { comment })
         } as any;
-
-        addToHistory(updatedGrade, oldGrade);
 
         let message = '';
         if (!attended && scoreValue !== null) {

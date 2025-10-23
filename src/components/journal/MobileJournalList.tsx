@@ -13,6 +13,8 @@ interface MobileJournalListProps {
     fullLessons: Lesson[];
     onCellClick: (student: Student, lesson: Lesson, grade: Grade) => void;
     onShowNotes: (studentId: number) => void;
+    quickMode?: boolean;
+    onQuickToggle?: (student: Student, lesson: Lesson, grade: Grade) => boolean;
 }
 
 const GradeCellDisplay = ({ grade }: { grade: Grade }) => {
@@ -42,9 +44,21 @@ export function MobileJournalList({
                                       fullGrades,
                                       fullLessons,
                                       onCellClick,
-                                      onShowNotes
+                                      onShowNotes,
+                                      quickMode = false,
+                                      onQuickToggle
                                   }: MobileJournalListProps) {
     const cellHoverColor = getCellHoverColor(type);
+
+    const handleCellClickWrapper = (student: Student, lesson: Lesson, grade: Grade) => {
+        // В швидкому режимі для лекцій - просто переключаємо
+        if (quickMode && type === 'lecture' && onQuickToggle) {
+            const handled = onQuickToggle(student, lesson, grade);
+            if (handled) return;
+        }
+        // Інакше відкриваємо модалку
+        onCellClick(student, lesson, grade);
+    };
 
     return (
         <div className="md:hidden p-4 space-y-4">
@@ -91,8 +105,10 @@ export function MobileJournalList({
                                     return (
                                         <button
                                             key={lesson.id}
-                                            onClick={() => grade && onCellClick(student, lesson, grade)}
-                                            className={`flex-shrink-0 flex flex-col items-center justify-center gap-1 p-2 rounded border ${cellHoverColor} disabled:opacity-50 w-24 h-20 transition-all relative`}
+                                            onClick={() => grade && handleCellClickWrapper(student, lesson, grade)}
+                                            className={`flex-shrink-0 flex flex-col items-center justify-center gap-1 p-2 rounded border ${cellHoverColor} disabled:opacity-50 w-24 h-20 transition-all relative ${
+                                                quickMode && type === 'lecture' ? 'ring-1 ring-green-300' : ''
+                                            }`}
                                         >
                                             <div className="text-xs text-gray-600 whitespace-nowrap font-medium">
                                                 {lesson.date}

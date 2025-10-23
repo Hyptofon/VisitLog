@@ -1,6 +1,6 @@
-import { Check, X, Minus, Plus, MessageSquare, History, StickyNote } from 'lucide-react';
+import { Check, X, Minus, Plus, MessageSquare, StickyNote } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
-import { Student, Lesson, Grade, StudentNote, GradeHistory } from '@/types';
+import { Student, Lesson, Grade, StudentNote } from '@/types';
 import { getRowColor, getCellHoverColor, getTotalScore, calculateAttendanceRate } from './utils';
 
 interface DesktopJournalTableProps {
@@ -11,13 +11,13 @@ interface DesktopJournalTableProps {
     headerColor: string;
     studentNotes: Record<number, StudentNote[]>;
     individualPlans: Record<number, boolean>;
-    gradeHistory: Record<string, GradeHistory[]>;
     fullGrades: Grade[];
     fullLessons: Lesson[];
     onCellClick: (student: Student, lesson: Lesson, grade: Grade) => void;
     onShowNotes: (studentId: number) => void;
     onToggleIndividualPlan: (studentId: number) => void;
-    onShowHistory: (studentId: number, lessonId: number) => void;
+    quickMode?: boolean;
+    onQuickToggle?: (student: Student, lesson: Lesson, grade: Grade) => boolean;
 }
 
 const GradeCellDisplay = ({ grade }: { grade: Grade }) => {
@@ -47,15 +47,25 @@ export function DesktopJournalTable({
                                         headerColor,
                                         studentNotes,
                                         individualPlans,
-                                        gradeHistory,
                                         fullGrades,
                                         fullLessons,
                                         onCellClick,
                                         onShowNotes,
                                         onToggleIndividualPlan,
-                                        onShowHistory
+                                        quickMode = false,
+                                        onQuickToggle
                                     }: DesktopJournalTableProps) {
     const cellHoverColor = getCellHoverColor(type);
+
+    const handleCellClickWrapper = (student: Student, lesson: Lesson, grade: Grade) => {
+        // В швидкому режимі для лекцій - просто переключаємо
+        if (quickMode && type === 'lecture' && onQuickToggle) {
+            const handled = onQuickToggle(student, lesson, grade);
+            if (handled) return;
+        }
+        // Інакше відкриваємо модалку
+        onCellClick(student, lesson, grade);
+    };
 
     return (
         <div className="hidden md:block">
@@ -141,14 +151,14 @@ export function DesktopJournalTable({
                                     {lessons.map((lesson) => {
                                         const grade = getGrade(student.id, lesson.id);
                                         const hasComment = grade && (grade as any).comment;
-                                        const historyKey = `${student.id}-${lesson.id}`;
-                                        const hasHistory = gradeHistory[historyKey]?.length > 0;
 
                                         return (
                                             <td
                                                 key={lesson.id}
-                                                className={`px-3 py-3 border-r text-center cursor-pointer ${cellHoverColor} transition-all ${rowColor} min-w-[120px] relative`}
-                                                onClick={() => grade && onCellClick(student, lesson, grade)}
+                                                className={`px-3 py-3 border-r text-center cursor-pointer ${cellHoverColor} transition-all ${rowColor} min-w-[120px] relative ${
+                                                    quickMode && type === 'lecture' ? 'cursor-pointer ring-1 ring-green-300/50' : ''
+                                                }`}
+                                                onClick={() => grade && handleCellClickWrapper(student, lesson, grade)}
                                             >
                                                 {grade && (
                                                     <div className="flex flex-col items-center justify-center gap-1">
@@ -158,17 +168,6 @@ export function DesktopJournalTable({
                                                         <div className="flex gap-1">
                                                             {hasComment && (
                                                                 <MessageSquare className="h-3 w-3 text-blue-500" />
-                                                            )}
-                                                            {hasHistory && (
-                                                                <button
-                                                                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                                        e.stopPropagation();
-                                                                        onShowHistory(student.id, lesson.id);
-                                                                    }}
-                                                                    className="hover:scale-125 transition-transform"
-                                                                >
-                                                                    <History className="h-3 w-3 text-orange-500" />
-                                                                </button>
                                                             )}
                                                         </div>
                                                     </div>
