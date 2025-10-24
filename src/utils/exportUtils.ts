@@ -4,7 +4,7 @@ export function exportToExcel(
     students: Student[],
     lessons: Lesson[],
     grades: Grade[],
-    type: 'lecture' | 'practical' | 'laboratory'
+    type: 'lecture' | 'practical' | 'laboratory' | 'all'
 ) {
     // Create CSV content
     const filteredLessons = lessons.filter(l => l.type === type);
@@ -53,7 +53,7 @@ export function exportToPDF(
     students: Student[],
     lessons: Lesson[],
     grades: Grade[],
-    type: 'lecture' | 'practical' | 'laboratory'
+    type: 'lecture' | 'practical' | 'laboratory' | 'all'
 ) {
     // For PDF export, we'll create a printable HTML page
     const filteredLessons = lessons.filter(l => l.type === type);

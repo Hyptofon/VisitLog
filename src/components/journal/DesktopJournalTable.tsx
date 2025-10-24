@@ -58,26 +58,24 @@ export function DesktopJournalTable({
     const cellHoverColor = getCellHoverColor(type);
 
     const handleCellClickWrapper = (student: Student, lesson: Lesson, grade: Grade) => {
-        // В швидкому режимі для лекцій - просто переключаємо
         if (quickMode && type === 'lecture' && onQuickToggle) {
             const handled = onQuickToggle(student, lesson, grade);
             if (handled) return;
         }
-        // Інакше відкриваємо модалку
         onCellClick(student, lesson, grade);
     };
 
     return (
         <div className="hidden md:block">
-            <ScrollArea className="w-full">
-                <div className="min-w-max">
+            <ScrollArea className="w-full rotate-x-180">
+                <div className="min-w-max rotate-x-180">
                     <table className="w-full border-collapse">
                         <thead>
                         <tr className={headerColor}>
-                            <th className={`sticky left-0 ${headerColor} z-20 px-3 py-3 text-left border-r border-b w-[50px]`}>
+                            <th className={`sticky left-0 ${headerColor} z-40 px-3 py-3 text-left border-r border-b w-[50px]`}>
                                 <div className="text-sm font-semibold">#</div>
                             </th>
-                            <th className={`sticky left-[50px] ${headerColor} z-20 px-4 py-3 text-left border-r border-b min-w-[280px]`}>
+                            <th className={`sticky left-[50px] ${headerColor} z-40 px-4 py-3 text-left border-r border-b min-w-[280px]`}>
                                 <div className="text-sm font-semibold">Студент</div>
                             </th>
                             <th className={`px-3 py-3 border-r border-b ${headerColor} min-w-[80px] text-center`}>
@@ -94,7 +92,7 @@ export function DesktopJournalTable({
                                     <div className="text-sm font-semibold whitespace-nowrap">{lesson.date}</div>
                                 </th>
                             ))}
-                            <th className={`sticky right-0 ${headerColor} z-10 px-4 py-3 border-l border-b min-w-[138px] shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.1)] text-center`}>
+                            <th className={`sticky right-0 ${headerColor} z-30 px-4 py-3 border-l border-b min-w-[138px] shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.1)] text-center`}>
                                 <div className="text-sm font-semibold">Відвідування</div>
                             </th>
                         </tr>
@@ -104,21 +102,21 @@ export function DesktopJournalTable({
                             const rowColor = getRowColor(idx, type);
                             const attendanceRate = calculateAttendanceRate(student.id, fullGrades, fullLessons, type);
                             const attendanceRateValue = parseInt(attendanceRate);
+                            const baseBg = 'bg-background'; // Основний фон (білий або темний в залежності від теми)
 
                             return (
-                                <tr
-                                    key={student.id}
-                                    className={`border-b ${rowColor} transition-colors`}
-                                >
-                                    <td className={`sticky left-0 z-10 px-3 py-3 border-r ${rowColor} w-[50px]`}>
+                                // Фон з рядка `<tr>` прибрано
+                                <tr key={student.id} className="border-b transition-colors">
+                                    {/* Фон додано до кожної комірки `<td>` */}
+                                    <td className={`sticky left-0 z-30 px-3 py-3 border-r w-[50px] ${baseBg} ${rowColor}`}>
                                         <div className="text-sm">{idx + 1}</div>
                                     </td>
-                                    <td className={`sticky left-[50px] z-10 px-4 py-3 border-r ${rowColor} min-w-[280px]`}>
+                                    <td className={`sticky left-[50px] z-30 px-4 py-3 border-r min-w-[280px] ${baseBg} ${rowColor}`}>
                                         <div className="text-sm font-medium">
                                             {student.lastName} {student.firstName} {student.patronymic}
                                         </div>
                                     </td>
-                                    <td className={`px-3 py-3 border-r text-center ${rowColor} min-w-[80px]`}>
+                                    <td className={`px-3 py-3 border-r text-center min-w-[80px] ${baseBg} ${rowColor}`}>
                                         <button
                                             onClick={() => onShowNotes(student.id)}
                                             className="flex items-center justify-center w-full h-full transition-transform hover:scale-110 relative"
@@ -126,12 +124,12 @@ export function DesktopJournalTable({
                                             <StickyNote className="h-5 w-5 text-blue-600" />
                                             {studentNotes[student.id]?.length > 0 && (
                                                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                                                    {studentNotes[student.id].length}
-                                                </span>
+                                                        {studentNotes[student.id].length}
+                                                    </span>
                                             )}
                                         </button>
                                     </td>
-                                    <td className={`px-3 py-3 border-r text-center ${rowColor} min-w-[80px]`}>
+                                    <td className={`px-3 py-3 border-r text-center min-w-[80px] ${baseBg} ${rowColor}`}>
                                         <button
                                             onClick={() => onToggleIndividualPlan(student.id)}
                                             className="flex items-center justify-center w-full h-full transition-transform hover:scale-110"
@@ -143,7 +141,7 @@ export function DesktopJournalTable({
                                             )}
                                         </button>
                                     </td>
-                                    <td className={`px-3 py-3 border-r text-center ${rowColor} min-w-[70px]`}>
+                                    <td className={`px-3 py-3 border-r text-center min-w-[70px] ${baseBg} ${rowColor}`}>
                                         <div className="text-sm font-bold">
                                             {getTotalScore(student.id, fullGrades, fullLessons, type).toFixed(1)}
                                         </div>
@@ -155,7 +153,7 @@ export function DesktopJournalTable({
                                         return (
                                             <td
                                                 key={lesson.id}
-                                                className={`px-3 py-3 border-r text-center cursor-pointer ${cellHoverColor} transition-all ${rowColor} min-w-[120px] relative ${
+                                                className={`px-3 py-3 border-r text-center cursor-pointer transition-all min-w-[120px] relative ${cellHoverColor} ${baseBg} ${rowColor} ${
                                                     quickMode && type === 'lecture' ? 'cursor-pointer ring-1 ring-green-300/50' : ''
                                                 }`}
                                                 onClick={() => grade && handleCellClickWrapper(student, lesson, grade)}
@@ -175,7 +173,7 @@ export function DesktopJournalTable({
                                             </td>
                                         );
                                     })}
-                                    <td className={`sticky right-0 z-10 px-4 py-3 border-l text-center min-w-[120px] shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.1)] ${rowColor}`}>
+                                    <td className={`sticky right-0 z-30 px-4 py-3 border-l text-center min-w-[120px] shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.1)] ${baseBg} ${rowColor}`}>
                                         <div className={`text-sm font-bold ${
                                             attendanceRateValue >= 80 ? 'text-green-700' :
                                                 attendanceRateValue >= 60 ? 'text-yellow-700' : 'text-red-700'

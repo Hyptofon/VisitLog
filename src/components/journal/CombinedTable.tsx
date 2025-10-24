@@ -91,7 +91,6 @@ export function CombinedTable({
 
         onGradeUpdate(updatedGrade);
 
-        // Показуємо сповіщення про зміну статусу
         if (updatedGrade.attended) {
             toast.success(`${student.lastName} ${student.firstName} відмічений як присутній.`);
         } else {

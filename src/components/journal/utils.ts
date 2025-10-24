@@ -50,19 +50,13 @@ export const getCellHoverColor = (type: string) => {
 };
 
 export const getRowColor = (idx: number, type: string) => {
-    if (idx % 2 === 0) {
+    if (idx % 2 !== 0) {
         switch(type) {
-            case 'lecture': return 'bg-green-50/30';
-            case 'practical': return 'bg-blue-50/30';
-            case 'laboratory': return 'bg-purple-50/30';
-            default: return 'bg-white';
-        }
-    } else {
-        switch(type) {
-            case 'lecture': return 'bg-green-50/50';
-            case 'practical': return 'bg-blue-50/50';
-            case 'laboratory': return 'bg-purple-50/50';
+            case 'lecture': return 'bg-green-50';
+            case 'practical': return 'bg-blue-50';
+            case 'laboratory': return 'bg-purple-50';
             default: return 'bg-gray-50';
         }
     }
+    return '';
 };
