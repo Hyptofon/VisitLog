@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Student, Lesson, Grade } from '@/types';
 import { Card } from '../ui/card';
 import { DatePagination } from '../DatePagination';
@@ -14,6 +14,7 @@ import { Label } from '../ui/label';
 import { Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { ViewOptions } from './ViewOptions';
+import { getCurrentDate, calculatePageForTodayLesson } from '@/utils/dateUtils'
 
 interface CombinedTableProps {
     students: Student[];
@@ -34,9 +35,28 @@ export function CombinedTable({
                               }: CombinedTableProps) {
     const [viewMode, setViewMode] = useState<'pagination' | 'scroll'>('pagination');
     const [lessonsPerPage, setLessonsPerPage] = useState(6);
-
     const [currentPage, setCurrentPage] = useState(0);
     const [quickMode, setQuickMode] = useState(false);
+
+    const hasJumpedToTodayRef = useRef(false);
+
+    useEffect(() => {
+        if (viewMode === 'pagination' && !hasJumpedToTodayRef.current) {
+            const todayPage = calculatePageForTodayLesson(lessons, lessonsPerPage);
+
+            if (todayPage !== null) {
+                setCurrentPage(todayPage);
+                toast.success('Перехід до поточної дати', { id: 'jump-to-date-toast' });
+            }
+
+            hasJumpedToTodayRef.current = true;
+        }
+
+        if (viewMode !== 'pagination') {
+            hasJumpedToTodayRef.current = false;
+        }
+
+    }, [viewMode, lessons, lessonsPerPage]);
 
     const filteredStudents = useMemo(() => {
         if (!searchQuery) return students;
@@ -46,15 +66,17 @@ export function CombinedTable({
         );
     }, [students, searchQuery]);
 
-    const { displayLessons, totalPages } = useMemo(() => {
+    const { displayLessons, totalPages, currentDate } = useMemo(() => {
+        const today = getCurrentDate();
+
         if (viewMode === 'scroll') {
-            return { displayLessons: lessons, totalPages: 1 };
+            return { displayLessons: lessons, totalPages: 1, currentDate: today };
         }
 
         const total = Math.ceil(lessons.length / lessonsPerPage);
 
-        if (currentPage >= total) {
-            setCurrentPage(Math.max(0, total - 1));
+        if (currentPage >= total && total > 0) {
+            setCurrentPage(total - 1);
         }
 
         const start = currentPage * lessonsPerPage;
@@ -62,6 +84,7 @@ export function CombinedTable({
         return {
             displayLessons: lessons.slice(start, end),
             totalPages: total,
+            currentDate: today
         };
     }, [lessons, viewMode, lessonsPerPage, currentPage]);
 
@@ -117,10 +140,14 @@ export function CombinedTable({
 
     const getTitle = () => {
         switch(type) {
-            case 'lecture': return 'Журнал відвідування - Лекції';
-            case 'practical': return 'Журнал відвідування та оцінок - Практичні';
-            case 'laboratory': return 'Журнал відвідування та оцінок - Лабораторні';
-            default: return 'Журнал';
+            case 'lecture':
+                return 'Журнал відвідування - Лекції';
+            case 'practical':
+                return 'Журнал відвідування та оцінок - Практичні';
+            case 'laboratory':
+                return 'Журнал відвідування та оцінок - Лабораторні';
+            default:
+                return 'Журнал';
         }
     };
 
@@ -131,9 +158,8 @@ export function CombinedTable({
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div className="flex items-center gap-4 flex-wrap">
                             <h3 className="text-lg font-semibold">{getTitle()}</h3>
-
                             {type === 'lecture' && (
-                                <div className="flex items-center gap-2 bg-white/50 px-3 py-1.5 rounded-lg border border-green-200">
+                                <div className="flex items-center gap-2 bg-white/50 dark:bg-black/20 px-3 py-1.5 rounded-lg border border-green-200 dark:border-green-800">
                                     <input
                                         type="checkbox"
                                         id="quickMode"
@@ -152,7 +178,6 @@ export function CombinedTable({
                             )}
                         </div>
 
-                        {/* --- Новий блок для пагінації та налаштувань --- */}
                         <div className="flex items-center gap-2">
                             <ViewOptions
                                 viewMode={viewMode}
@@ -168,13 +193,12 @@ export function CombinedTable({
                                 />
                             )}
                         </div>
-                        {/* ---------------------------------------------------- */}
                     </div>
 
                     {type === 'lecture' && quickMode && (
-                        <div className="mt-2 text-xs text-green-700 bg-green-50 px-3 py-2 rounded border border-green-200">
-                            <span className="font-semibold">Підказка:</span> Один клік - переключити присутність/відсутність.
-                            Для балів та коментарів вимкніть швидкий режим.
+                        <div className="mt-2 text-xs text-green-700 bg-green-50 dark:bg-green-900/20 px-3 py-2 rounded border border-green-200 dark:border-green-800">
+                            <span className="font-semibold">Підказка:</span> Один клік - переключити
+                            присутність/відсутність. Для балів та коментарів вимкніть швидкий режим.
                         </div>
                     )}
                 </div>
@@ -194,6 +218,7 @@ export function CombinedTable({
                     onToggleIndividualPlan={toggleIndividualPlan}
                     quickMode={quickMode}
                     onQuickToggle={handleQuickToggle}
+                    currentDate={currentDate}
                 />
 
                 <MobileJournalList
@@ -207,6 +232,7 @@ export function CombinedTable({
                     onShowNotes={setShowNotesDialog}
                     quickMode={quickMode}
                     onQuickToggle={handleQuickToggle}
+                    currentDate={currentDate}
                 />
             </Card>
 

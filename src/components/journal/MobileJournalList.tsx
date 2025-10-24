@@ -1,8 +1,10 @@
-import { Check, X, MessageSquare, StickyNote } from 'lucide-react';
+import { Check, X, MessageSquare, StickyNote, Calendar } from 'lucide-react';
 import { Card } from '../ui/card';
 import { ScrollArea } from '../ui/scroll-area';
 import { Student, Lesson, Grade } from '@/types';
 import { getRowColor, getCellHoverColor, getTotalScore, calculateAttendanceRate } from './utils';
+import { isSameDate, getTodayHighlightColors } from '@/utils/dateUtils'
+
 
 interface MobileJournalListProps {
     type: 'lecture' | 'practical' | 'laboratory';
@@ -15,6 +17,7 @@ interface MobileJournalListProps {
     onShowNotes: (studentId: number) => void;
     quickMode?: boolean;
     onQuickToggle?: (student: Student, lesson: Lesson, grade: Grade) => boolean;
+    currentDate: string;
 }
 
 const GradeCellDisplay = ({ grade }: { grade: Grade }) => {
@@ -24,7 +27,7 @@ const GradeCellDisplay = ({ grade }: { grade: Grade }) => {
     if (grade.score !== null) {
         return (
             <div className="flex flex-col items-center">
-                <span className="text-sm font-bold text-gray-800">
+                <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
                     {grade.score}
                 </span>
                 {!grade.attended && (
@@ -46,17 +49,17 @@ export function MobileJournalList({
                                       onCellClick,
                                       onShowNotes,
                                       quickMode = false,
-                                      onQuickToggle
+                                      onQuickToggle,
+                                      currentDate
                                   }: MobileJournalListProps) {
     const cellHoverColor = getCellHoverColor(type);
+    const todayColors = getTodayHighlightColors(type);
 
     const handleCellClickWrapper = (student: Student, lesson: Lesson, grade: Grade) => {
-        // В швидкому режимі для лекцій - просто переключаємо
         if (quickMode && type === 'lecture' && onQuickToggle) {
             const handled = onQuickToggle(student, lesson, grade);
             if (handled) return;
         }
-        // Інакше відкриваємо модалку
         onCellClick(student, lesson, grade);
     };
 
@@ -72,11 +75,11 @@ export function MobileJournalList({
                         <div className="mb-3 pb-3 border-b">
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <div className="text-sm text-gray-500">#{idx + 1}</div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">#{idx + 1}</div>
                                     <div className="font-medium mt-1">
                                         {student.lastName} {student.firstName} {student.patronymic}
                                     </div>
-                                    <div className="text-sm font-semibold text-gray-700 mt-1">
+                                    <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-1">
                                         Сума: {getTotalScore(student.id, fullGrades, fullLessons, type).toFixed(1)}
                                     </div>
                                 </div>
@@ -101,16 +104,22 @@ export function MobileJournalList({
                                 {lessons.map((lesson) => {
                                     const grade = getGrade(student.id, lesson.id);
                                     const hasComment = grade && (grade as any).comment;
+                                    const isToday = isSameDate(lesson.date, currentDate);
 
                                     return (
                                         <button
                                             key={lesson.id}
                                             onClick={() => grade && handleCellClickWrapper(student, lesson, grade)}
-                                            className={`flex-shrink-0 flex flex-col items-center justify-center gap-1 p-2 rounded border ${cellHoverColor} disabled:opacity-50 w-24 h-20 transition-all relative ${
+                                            className={`flex-shrink-0 flex flex-col items-center justify-center gap-1 p-2 rounded-lg ${cellHoverColor} disabled:opacity-50 w-24 h-20 transition-all relative ${
                                                 quickMode && type === 'lecture' ? 'ring-1 ring-green-300' : ''
+                                            } ${
+                                                isToday ? `${todayColors.cell} ${todayColors.cellBorder}` : 'border'
                                             }`}
                                         >
-                                            <div className="text-xs text-gray-600 whitespace-nowrap font-medium">
+                                            <div className={`text-xs whitespace-nowrap font-medium flex items-center gap-1 ${
+                                                isToday ? `${todayColors.textColor} font-bold` : 'text-gray-600 dark:text-gray-400'
+                                            }`}>
+                                                {isToday && <Calendar className="h-3 w-3" />}
                                                 {lesson.date}
                                             </div>
                                             <div className="flex-grow flex items-center justify-center">

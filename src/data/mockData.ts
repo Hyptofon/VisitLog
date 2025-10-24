@@ -73,7 +73,7 @@ export const lessons: Lesson[] = [
     { id: 16, date: '15.10.2025', type: 'lecture', number: 6 },
     { id: 17, date: '17.10.2025', type: 'practical', number: 6 },
     { id: 18, date: '20.10.2025', type: 'laboratory', number: 6 },
-    { id: 19, date: '22.10.2025', type: 'lecture', number: 7 },
+    { id: 19, date: '24.10.2025', type: 'lecture', number: 7 },
     { id: 20, date: '24.10.2025', type: 'practical', number: 7 },
     { id: 21, date: '27.10.2025', type: 'laboratory', number: 7 },
     { id: 22, date: '29.10.2025', type: 'lecture', number: 8 },

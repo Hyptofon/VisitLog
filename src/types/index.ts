@@ -20,28 +20,6 @@ export interface Grade {
     attended: boolean;
 }
 
-export interface StudentStats {
-    studentId: number;
-    averageGrade: number;
-    attendanceRate: number;
-    totalAbsences: number;
-}
-
-export interface GradeHistory {
-    timestamp: string;
-    oldValue: {
-        attended: boolean;
-        score: number | null;
-        comment?: string;
-    };
-    newValue: {
-        attended: boolean;
-        score: number | null;
-        comment?: string;
-    };
-    changedBy: string;
-}
-
 export interface StudentNote {
     id: number;
     text: string;
