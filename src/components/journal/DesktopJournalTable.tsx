@@ -1,11 +1,11 @@
 import { Check, X, Minus, Plus, MessageSquare, StickyNote, Calendar } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { Student, Lesson, Grade, StudentNote } from '@/types';
-import { getRowColor, getCellHoverColor, getTotalScore, calculateAttendanceRate } from './utils';
+import { getRowColor, getCellHoverColor, getTotalScore, calculateAttendanceRate, getLessonSpecificHeaderColor, getLessonSpecificTodayHighlightColors } from './utils';
 import { isSameDate, getTodayHighlightColors } from '@/utils/dateUtils'
 
 interface DesktopJournalTableProps {
-    type: 'lecture' | 'practical' | 'laboratory';
+    type: 'lecture' | 'practical' | 'laboratory' | 'all';
     students: Student[];
     lessons: Lesson[];
     getGrade: (studentId: number, lessonId: number) => Grade | undefined;
@@ -60,11 +60,9 @@ export function DesktopJournalTable({
                                         onQuickToggle,
                                         currentDate
                                     }: DesktopJournalTableProps) {
-    const cellHoverColor = getCellHoverColor(type);
-    const todayColors = getTodayHighlightColors(type);
 
     const handleCellClickWrapper = (student: Student, lesson: Lesson, grade: Grade) => {
-        if (quickMode && type === 'lecture' && onQuickToggle) {
+        if (quickMode && lesson.type === 'lecture' && onQuickToggle) {
             const handled = onQuickToggle(student, lesson, grade);
             if (handled) return;
         }
@@ -95,21 +93,29 @@ export function DesktopJournalTable({
                             </th>
                             {lessons.map((lesson) => {
                                 const isToday = isSameDate(lesson.date, currentDate);
+                                const lessonHeaderColor = type === 'all' ? getLessonSpecificHeaderColor(lesson.type) : headerColor;
+                                const lessonTodayColors = type === 'all' ? getLessonSpecificTodayHighlightColors(lesson.type) : getTodayHighlightColors(type);
+
                                 return (
                                     <th
                                         key={lesson.id}
                                         className={`px-3 py-3 border-r border-b min-w-[100px] text-center relative transition-colors ${
                                             isToday
-                                                ? `${todayColors.header} ${todayColors.headerRing}`
-                                                : headerColor
+                                                ? `${lessonTodayColors.header} ${lessonTodayColors.headerRing}`
+                                                : lessonHeaderColor
                                         }`}
                                     >
                                         <div className="text-sm font-semibold whitespace-nowrap flex items-center justify-center gap-1.5">
-                                            {isToday && <Calendar className={`h-4 w-4 ${todayColors.iconColor}`} />}
+                                            {isToday && <Calendar className={`h-4 w-4 ${lessonTodayColors.iconColor}`} />}
                                             {lesson.date}
                                         </div>
+                                        {type === 'all' && (
+                                            <div className="text-xs font-normal opacity-75 capitalize mt-1">
+                                                {lesson.type === 'lecture' ? 'Л' : lesson.type === 'practical' ? 'П' : 'Лаб'}
+                                            </div>
+                                        )}
                                         {isToday && (
-                                            <div className={`absolute bottom-0 left-0 right-0 h-1 ${todayColors.indicator}`}></div>
+                                            <div className={`absolute bottom-0 left-0 right-0 h-1 ${lessonTodayColors.indicator}`}></div>
                                         )}
                                     </th>
                                 );
@@ -124,21 +130,21 @@ export function DesktopJournalTable({
                             const rowColor = getRowColor(idx, type);
                             const attendanceRate = calculateAttendanceRate(student.id, fullGrades, fullLessons, type);
                             const attendanceRateValue = parseInt(attendanceRate);
-                            const baseBg = 'bg-background';
+                            const baseBg = 'bg-background dark:bg-gray-900';
 
                             return (
-                                <tr key={student.id} className="border-b transition-colors">
-                                    <td className={`sticky left-0 z-30 px-3 py-3 border-r w-[50px] ${baseBg} ${rowColor}`}>
+                                <tr key={student.id} className="border-b dark:border-gray-700 transition-colors">
+                                    <td className={`sticky left-0 z-20 px-3 py-3 border-r dark:border-gray-700 w-[50px] ${baseBg} ${rowColor}`}>
                                         <div className="text-sm">{idx + 1}</div>
                                     </td>
 
-                                    <td className={`sticky left-[50px] z-30 px-4 py-3 border-r min-w-[280px] ${baseBg} ${rowColor}`}>
+                                    <td className={`sticky left-[50px] z-20 px-4 py-3 border-r dark:border-gray-700 min-w-[280px] ${baseBg} ${rowColor}`}>
                                         <div className="text-sm font-medium">
                                             {student.lastName} {student.firstName} {student.patronymic}
                                         </div>
                                     </td>
 
-                                    <td className={`px-3 py-3 border-r text-center min-w-[80px] ${baseBg} ${rowColor}`}>
+                                    <td className={`px-3 py-3 border-r dark:border-gray-700 text-center min-w-[80px] ${baseBg} ${rowColor}`}>
                                         <button
                                             onClick={() => onShowNotes(student.id)}
                                             className="flex items-center justify-center w-full h-full transition-transform hover:scale-110 relative"
@@ -152,7 +158,7 @@ export function DesktopJournalTable({
                                         </button>
                                     </td>
 
-                                    <td className={`px-3 py-3 border-r text-center min-w-[80px] ${baseBg} ${rowColor}`}>
+                                    <td className={`px-3 py-3 border-r dark:border-gray-700 text-center min-w-[80px] ${baseBg} ${rowColor}`}>
                                         <button
                                             onClick={() => onToggleIndividualPlan(student.id)}
                                             className="flex items-center justify-center w-full h-full transition-transform hover:scale-110"
@@ -165,7 +171,7 @@ export function DesktopJournalTable({
                                         </button>
                                     </td>
 
-                                    <td className={`px-3 py-3 border-r text-center min-w-[70px] ${baseBg} ${rowColor}`}>
+                                    <td className={`px-3 py-3 border-r dark:border-gray-700 text-center min-w-[70px] ${baseBg} ${rowColor}`}>
                                         <div className="text-sm font-bold">
                                             {getTotalScore(student.id, fullGrades, fullLessons, type).toFixed(1)}
                                         </div>
@@ -173,19 +179,21 @@ export function DesktopJournalTable({
 
                                     {lessons.map((lesson) => {
                                         const grade = getGrade(student.id, lesson.id);
-                                        const hasComment = grade && (grade as any).comment;
+                                        const hasComment = grade && grade.comment;
                                         const isToday = isSameDate(lesson.date, currentDate);
+                                        const lessonCellHover = getCellHoverColor(lesson.type);
+                                        const lessonTodayColors = getTodayHighlightColors(lesson.type);
 
                                         return (
                                             <td
                                                 key={lesson.id}
-                                                className={`px-3 py-3 border-r text-center cursor-pointer transition-all min-w-[120px] relative ${cellHoverColor} ${baseBg} ${rowColor} ${
-                                                    quickMode && type === 'lecture'
+                                                className={`px-3 py-3 border-r dark:border-gray-700 text-center cursor-pointer transition-all min-w-[120px] relative ${type === 'all' ? lessonCellHover : getCellHoverColor(type)} ${baseBg} ${rowColor} ${
+                                                    quickMode && lesson.type === 'lecture'
                                                         ? 'cursor-pointer'
                                                         : ''
                                                 } ${
                                                     isToday
-                                                        ? `${todayColors.cell} ${todayColors.cellRing}`
+                                                        ? `${lessonTodayColors.cell} ${lessonTodayColors.cellRing}`
                                                         : ''
                                                 }`}
                                                 onClick={() => grade && handleCellClickWrapper(student, lesson, grade)}
@@ -203,20 +211,20 @@ export function DesktopJournalTable({
                                                     </div>
                                                 )}
                                                 {isToday && (
-                                                    <div className={`absolute inset-0 ${todayColors.cellBorder} pointer-events-none rounded-md`}></div>
+                                                    <div className={`absolute inset-0 ${lessonTodayColors.cellBorder} pointer-events-none rounded-md`}></div>
                                                 )}
                                             </td>
                                         );
                                     })}
 
-                                    <td className={`sticky right-0 z-30 px-4 py-3 border-l text-center min-w-[120px] shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.1)] ${baseBg} ${rowColor}`}>
+                                    <td className={`sticky right-0 z-20 px-4 py-3 border-l dark:border-gray-700 text-center min-w-[120px] shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_6px_-1px_rgba(255,255,255,0.05)] ${baseBg} ${rowColor}`}>
                                         <div
                                             className={`text-sm font-bold ${
                                                 attendanceRateValue >= 80
-                                                    ? 'text-green-700'
+                                                    ? 'text-green-700 dark:text-green-400'
                                                     : attendanceRateValue >= 60
-                                                        ? 'text-yellow-700'
-                                                        : 'text-red-700'
+                                                        ? 'text-yellow-700 dark:text-yellow-400'
+                                                        : 'text-red-700 dark:text-red-400'
                                             }`}
                                         >
                                             {attendanceRate}

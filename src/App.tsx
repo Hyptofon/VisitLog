@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Download, FileSpreadsheet, Menu } from 'lucide-react';
+import { ArrowLeft, Download, FileSpreadsheet, Menu, LayoutGrid } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card } from './components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs';
@@ -12,11 +12,13 @@ import { Grade } from './types';
 import { exportToExcel, exportToPDF } from './utils/exportUtils';
 import { toast, Toaster } from 'sonner';
 
+type JournalType = 'lecture' | 'practical' | 'laboratory' | 'all';
+
 export default function App() {
-    const [selectedType, setSelectedType] = useState<'lecture' | 'practical' | 'laboratory' | null>(null);
+    const [selectedType, setSelectedType] = useState<JournalType | null>(null);
     const [grades, setGrades] = useState<Grade[]>(initialGrades);
     const [searchQuery, setSearchQuery] = useState('');
-    const [activeTab, setActiveTab] = useState<'lecture' | 'practical' | 'laboratory'>('lecture');
+    const [activeTab, setActiveTab] = useState<JournalType>('all');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const handleGradeUpdate = (updatedGrade: Grade) => {
@@ -29,21 +31,26 @@ export default function App() {
         );
     };
 
+    const handleSelectType = (type: JournalType) => {
+        setSelectedType(type);
+        setActiveTab(type);
+    };
+
     const handleExportExcel = () => {
-        exportToExcel(students, lessons.filter(l => l.type === activeTab), grades, activeTab);
+        exportToExcel(students, filteredLessons, grades, activeTab);
         toast.success('Дані успішно експортовано в Excel', { duration: 3000 });
     };
 
     const handleExportPDF = () => {
-        exportToPDF(students, lessons.filter(l => l.type === activeTab), grades, activeTab);
+        exportToPDF(students, filteredLessons, grades, activeTab);
         toast.success('Документ підготовлено до друку', { duration: 3000 });
     };
 
     if (!selectedType) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-black dark:to-gray-800 flex items-center justify-center p-4">
                 <Toaster position="top-right" expand={true} richColors />
-                <Card className="max-w-2xl w-full p-6 md:p-8">
+                <Card className="max-w-2xl w-full p-6 md:p-8 dark:bg-gray-800/50 dark:border-gray-700">
                     <div className="text-center mb-6 md:mb-8">
                         <h1 className="mb-2 text-xl md:text-2xl font-bold">Журнал відвідувань</h1>
                         <p className="text-sm md:text-base text-muted-foreground">
@@ -63,7 +70,23 @@ export default function App() {
                         </p>
 
                         <Button
-                            onClick={() => { setSelectedType('lecture'); setActiveTab('lecture'); }}
+                            onClick={() => handleSelectType('all')}
+                            className="w-full h-auto py-4 md:py-6 bg-gray-400 hover:bg-gray-500"
+                            size="lg"
+                        >
+                            <div className="text-left w-full flex items-center gap-4">
+                                <LayoutGrid className="h-8 w-8 flex-shrink-0" />
+                                <div>
+                                    <div className="text-base md:text-lg font-semibold mb-1">Усі заняття</div>
+                                    <div className="text-xs md:text-sm opacity-80 font-normal">
+                                        Перегляд всіх лекцій, практичних та лабораторних
+                                    </div>
+                                </div>
+                            </div>
+                        </Button>
+
+                        <Button
+                            onClick={() => handleSelectType('lecture')}
                             className="w-full h-auto py-4 md:py-6 bg-green-400 hover:bg-green-500"
                             size="lg"
                         >
@@ -76,7 +99,7 @@ export default function App() {
                         </Button>
 
                         <Button
-                            onClick={() => { setSelectedType('practical'); setActiveTab('practical'); }}
+                            onClick={() => handleSelectType('practical')}
                             className="w-full h-auto py-4 md:py-6 bg-blue-400 hover:bg-blue-500"
                             size="lg"
                         >
@@ -89,7 +112,7 @@ export default function App() {
                         </Button>
 
                         <Button
-                            onClick={() => { setSelectedType('laboratory'); setActiveTab('laboratory'); }}
+                            onClick={() => handleSelectType('laboratory')}
                             className="w-full h-auto py-4 md:py-6 bg-purple-400 hover:bg-purple-500"
                             size="lg"
                         >
@@ -106,12 +129,12 @@ export default function App() {
         );
     }
 
-    const filteredLessons = lessons.filter(l => l.type === activeTab);
+    const filteredLessons = activeTab === 'all' ? lessons : lessons.filter(l => l.type === activeTab);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Toaster position="top-right" expand={true} richColors />
-            <header className="bg-white border-b sticky top-0 z-30 shadow-sm">
+            <header className="bg-white dark:bg-gray-950/50 dark:border-gray-800 border-b sticky top-0 z-50 shadow-sm">
                 <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
                     <div className="md:hidden">
                         <div className="flex items-center justify-between mb-3">
@@ -145,17 +168,12 @@ export default function App() {
                                 </SheetContent>
                             </Sheet>
                         </div>
-                        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'lecture' | 'practical' | 'laboratory')} className="mb-3">
-                            <TabsList className="w-full grid grid-cols-3">
-                                <TabsTrigger value="lecture" className="text-xs">
-                                    Лекції
-                                </TabsTrigger>
-                                <TabsTrigger value="practical" className="text-xs">
-                                    Практичні
-                                </TabsTrigger>
-                                <TabsTrigger value="laboratory" className="text-xs">
-                                    Лабораторні
-                                </TabsTrigger>
+                        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as JournalType)} className="mb-3">
+                            <TabsList className="w-full grid grid-cols-4">
+                                <TabsTrigger value="all" className="text-xs">Усі</TabsTrigger>
+                                <TabsTrigger value="lecture" className="text-xs">Лекції</TabsTrigger>
+                                <TabsTrigger value="practical" className="text-xs">Практичні</TabsTrigger>
+                                <TabsTrigger value="laboratory" className="text-xs">Лабораторні</TabsTrigger>
                             </TabsList>
                         </Tabs>
                         <SearchBar value={searchQuery} onChange={setSearchQuery} />
@@ -183,8 +201,9 @@ export default function App() {
                             </div>
                         </div>
                         <div className="flex items-center justify-between">
-                            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'lecture' | 'practical' | 'laboratory')}>
+                            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as JournalType)}>
                                 <TabsList>
+                                    <TabsTrigger value="all">Усі заняття</TabsTrigger>
                                     <TabsTrigger value="lecture">Лекції</TabsTrigger>
                                     <TabsTrigger value="practical">Практичні</TabsTrigger>
                                     <TabsTrigger value="laboratory">Лабораторні</TabsTrigger>

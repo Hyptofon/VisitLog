@@ -18,7 +18,9 @@ export interface Grade {
     score: number | null;
     extraPoints: number;
     attended: boolean;
+    comment?: string;
 }
+
 
 export interface StudentNote {
     id: number;

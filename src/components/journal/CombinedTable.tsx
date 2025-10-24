@@ -22,7 +22,7 @@ interface CombinedTableProps {
     grades: Grade[];
     onGradeUpdate: (grade: Grade) => void;
     searchQuery: string;
-    type: 'lecture' | 'practical' | 'laboratory';
+    type: 'lecture' | 'practical' | 'laboratory' | 'all';
 }
 
 export function CombinedTable({
@@ -58,6 +58,18 @@ export function CombinedTable({
 
     }, [viewMode, lessons, lessonsPerPage]);
 
+    const sortedLessons = useMemo(() => {
+        if (type === 'all') {
+            return [...lessons].sort((a, b) => {
+                const dateA = new Date(a.date.split('.').reverse().join('-')).getTime();
+                const dateB = new Date(b.date.split('.').reverse().join('-')).getTime();
+                return dateA - dateB;
+            });
+        }
+        return lessons;
+    }, [lessons, type]);
+
+
     const filteredStudents = useMemo(() => {
         if (!searchQuery) return students;
         const query = searchQuery.toLowerCase();
@@ -70,23 +82,22 @@ export function CombinedTable({
         const today = getCurrentDate();
 
         if (viewMode === 'scroll') {
-            return { displayLessons: lessons, totalPages: 1, currentDate: today };
+            return { displayLessons: sortedLessons, totalPages: 1, currentDate: today };
         }
 
-        const total = Math.ceil(lessons.length / lessonsPerPage);
+        const total = Math.ceil(sortedLessons.length / lessonsPerPage);
 
-        if (currentPage >= total && total > 0) {
-            setCurrentPage(total - 1);
-        }
+        const safeCurrentPage = Math.max(0, Math.min(currentPage, total > 0 ? total - 1 : 0));
 
-        const start = currentPage * lessonsPerPage;
+        const start = safeCurrentPage * lessonsPerPage;
         const end = start + lessonsPerPage;
+
         return {
-            displayLessons: lessons.slice(start, end),
+            displayLessons: sortedLessons.slice(start, end),
             totalPages: total,
             currentDate: today
         };
-    }, [lessons, viewMode, lessonsPerPage, currentPage]);
+    }, [sortedLessons, viewMode, lessonsPerPage, currentPage]);
 
     const { individualPlans, toggleIndividualPlan } = useIndividualPlans(students);
 
@@ -116,8 +127,8 @@ export function CombinedTable({
         return grades.find(g => g.studentId === studentId && g.lessonId === lessonId);
     }, [grades]);
 
-    const handleQuickToggle = useCallback((student: Student, _lesson: Lesson, grade: Grade) => {
-        if (!quickMode || type !== 'lecture') return false;
+    const handleQuickToggle = useCallback((student: Student, lesson: Lesson, grade: Grade) => {
+        if (!quickMode || lesson.type !== 'lecture') return false;
 
         const updatedGrade: Grade = {
             ...grade,
@@ -144,27 +155,24 @@ export function CombinedTable({
         }
 
         return true;
-    }, [quickMode, type, onGradeUpdate]);
+    }, [quickMode, onGradeUpdate]);
 
     const headerColor = getHeaderColor(type);
 
     const getTitle = () => {
         switch(type) {
-            case 'lecture':
-                return 'Журнал відвідування - Лекції';
-            case 'practical':
-                return 'Журнал відвідування та оцінок - Практичні';
-            case 'laboratory':
-                return 'Журнал відвідування та оцінок - Лабораторні';
-            default:
-                return 'Журнал';
+            case 'lecture': return 'Журнал відвідування - Лекції';
+            case 'practical': return 'Журнал оцінок - Практичні';
+            case 'laboratory': return 'Журнал оцінок - Лабораторні';
+            case 'all': return 'Загальний журнал';
+            default: return 'Журнал';
         }
     };
 
     return (
         <>
-            <Card className="overflow-hidden">
-                <div className={`p-4 border-b ${headerColor}`}>
+            <Card className="overflow-hidden dark:bg-gray-800/20 dark:border-gray-700">
+                <div className={`p-4 border-b dark:border-gray-700 ${headerColor}`}>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div className="flex items-center gap-4 flex-wrap">
                             <h3 className="text-lg font-semibold">{getTitle()}</h3>
@@ -222,7 +230,7 @@ export function CombinedTable({
                     studentNotes={studentNotes}
                     individualPlans={individualPlans}
                     fullGrades={grades}
-                    fullLessons={lessons}
+                    fullLessons={sortedLessons}
                     onCellClick={handleCellClick}
                     onShowNotes={setShowNotesDialog}
                     onToggleIndividualPlan={toggleIndividualPlan}
@@ -237,7 +245,7 @@ export function CombinedTable({
                     lessons={displayLessons}
                     getGrade={getGrade}
                     fullGrades={grades}
-                    fullLessons={lessons}
+                    fullLessons={sortedLessons}
                     onCellClick={handleCellClick}
                     onShowNotes={setShowNotesDialog}
                     quickMode={quickMode}

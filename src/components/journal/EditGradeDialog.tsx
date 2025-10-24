@@ -1,6 +1,4 @@
-// D:\REACT\untitled4\src\components\journal\EditGradeDialog.tsx
-
-import { Minus, Plus, MessageSquare, X } from 'lucide-react'; // <-- 1. Додано іконку X
+import { Minus, Plus, MessageSquare, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { Input } from '../ui/input';
@@ -116,13 +114,11 @@ export function EditGradeDialog({
                     </div>
 
                     <div className="space-y-2">
-                        {/* --- 2. Новий контейнер для заголовка та кнопки --- */}
                         <div className="flex justify-between items-center">
                             <Label htmlFor="comment" className="flex items-center gap-2">
                                 <MessageSquare className="h-4 w-4" />
                                 Коментар до оцінки
                             </Label>
-                            {/* --- 3. Нова кнопка для очищення --- */}
                             <Button
                                 type="button"
                                 variant="ghost"
