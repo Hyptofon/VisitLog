@@ -13,6 +13,7 @@ import { MobileJournalList } from './MobileJournalList';
 import { Label } from '../ui/label';
 import { Zap } from 'lucide-react';
 import { toast } from 'sonner';
+import { ViewOptions } from './ViewOptions';
 
 interface CombinedTableProps {
     students: Student[];
@@ -23,8 +24,6 @@ interface CombinedTableProps {
     type: 'lecture' | 'practical' | 'laboratory';
 }
 
-const LESSONS_PER_PAGE = 6;
-
 export function CombinedTable({
                                   students,
                                   lessons,
@@ -33,6 +32,8 @@ export function CombinedTable({
                                   searchQuery,
                                   type,
                               }: CombinedTableProps) {
+    const [viewMode, setViewMode] = useState<'pagination' | 'scroll'>('pagination');
+    const [lessonsPerPage, setLessonsPerPage] = useState(6);
 
     const [currentPage, setCurrentPage] = useState(0);
     const [quickMode, setQuickMode] = useState(false);
@@ -45,11 +46,24 @@ export function CombinedTable({
         );
     }, [students, searchQuery]);
 
-    const totalPages = Math.ceil(lessons.length / LESSONS_PER_PAGE);
-    const paginatedLessons = lessons.slice(
-        currentPage * LESSONS_PER_PAGE,
-        (currentPage + 1) * LESSONS_PER_PAGE
-    );
+    const { displayLessons, totalPages } = useMemo(() => {
+        if (viewMode === 'scroll') {
+            return { displayLessons: lessons, totalPages: 1 };
+        }
+
+        const total = Math.ceil(lessons.length / lessonsPerPage);
+
+        if (currentPage >= total) {
+            setCurrentPage(Math.max(0, total - 1));
+        }
+
+        const start = currentPage * lessonsPerPage;
+        const end = start + lessonsPerPage;
+        return {
+            displayLessons: lessons.slice(start, end),
+            totalPages: total,
+        };
+    }, [lessons, viewMode, lessonsPerPage, currentPage]);
 
     const { individualPlans, toggleIndividualPlan } = useIndividualPlans(students);
 
@@ -79,7 +93,6 @@ export function CombinedTable({
         return grades.find(g => g.studentId === studentId && g.lessonId === lessonId);
     }, [grades]);
 
-    // Швидке переключення присутності (тільки для лекцій)
     const handleQuickToggle = useCallback((student: Student, _lesson: Lesson, grade: Grade) => {
         if (!quickMode || type !== 'lecture') return false;
 
@@ -138,11 +151,24 @@ export function CombinedTable({
                                 </div>
                             )}
                         </div>
-                        <DatePagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={setCurrentPage}
-                        />
+
+                        {/* --- Новий блок для пагінації та налаштувань --- */}
+                        <div className="flex items-center gap-2">
+                            <ViewOptions
+                                viewMode={viewMode}
+                                setViewMode={setViewMode}
+                                lessonsPerPage={lessonsPerPage}
+                                setLessonsPerPage={setLessonsPerPage}
+                            />
+                            {viewMode === 'pagination' && totalPages > 1 && (
+                                <DatePagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={setCurrentPage}
+                                />
+                            )}
+                        </div>
+                        {/* ---------------------------------------------------- */}
                     </div>
 
                     {type === 'lecture' && quickMode && (
@@ -156,7 +182,7 @@ export function CombinedTable({
                 <DesktopJournalTable
                     type={type}
                     students={filteredStudents}
-                    lessons={paginatedLessons}
+                    lessons={displayLessons}
                     getGrade={getGrade}
                     headerColor={headerColor}
                     studentNotes={studentNotes}
@@ -173,7 +199,7 @@ export function CombinedTable({
                 <MobileJournalList
                     type={type}
                     students={filteredStudents}
-                    lessons={paginatedLessons}
+                    lessons={displayLessons}
                     getGrade={getGrade}
                     fullGrades={grades}
                     fullLessons={lessons}
