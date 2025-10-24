@@ -31,6 +31,8 @@ export const useGradeEditing = ({ onGradeUpdate }: UseGradeEditingProps) => {
 
     const handleCloseDialog = () => {
         setEditingCell(null);
+        setAttended(true);
+        setScore('');
         setComment('');
     };
 
@@ -56,7 +58,7 @@ export const useGradeEditing = ({ onGradeUpdate }: UseGradeEditingProps) => {
             ...oldGrade,
             attended: attended,
             score: scoreValue,
-            ...(comment && { comment })
+            comment: comment, // Оновлена логіка
         } as any;
 
         let message = '';
@@ -70,9 +72,14 @@ export const useGradeEditing = ({ onGradeUpdate }: UseGradeEditingProps) => {
             message = `${studentName} - присутність відмічено`;
         }
 
-        if (comment) {
-            message += ` "${comment}"`;
+        if (oldComment && !comment) {
+            message += ' (коментар видалено)';
+        } else if (!oldComment && comment) {
+            message += ` (додано коментар)`;
+        } else if (oldComment !== comment) {
+            message += ` (коментар змінено)`;
         }
+
 
         if (!attended && scoreValue !== null) {
             toast.warning(message, { duration: 3000 });

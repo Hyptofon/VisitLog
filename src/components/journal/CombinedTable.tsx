@@ -122,15 +122,25 @@ export function CombinedTable({
         const updatedGrade: Grade = {
             ...grade,
             attended: !grade.attended,
-            score: null,
+            score: grade.score,
         };
 
         onGradeUpdate(updatedGrade);
 
+        const studentName = `${student.lastName} ${student.firstName}`;
+
         if (updatedGrade.attended) {
-            toast.success(`${student.lastName} ${student.firstName} відмічений як присутній.`);
+            let message = `${studentName} відмічений як присутній.`;
+            if (updatedGrade.score !== null) {
+                message += ` Оцінка: ${updatedGrade.score}`;
+            }
+            toast.success(message);
         } else {
-            toast.error(`${student.lastName} ${student.firstName} відмічений як відсутній.`);
+            if (updatedGrade.score !== null) {
+                toast.warning(`${studentName} відмічений як відсутній, але оцінка ${updatedGrade.score} збережена.`);
+            } else {
+                toast.error(`${studentName} відмічений як відсутній.`);
+            }
         }
 
         return true;
