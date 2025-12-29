@@ -1,10 +1,9 @@
-import { Minus, Plus, MessageSquare, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
-import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Textarea } from '../ui/textarea';
 import { Grade, Lesson, Student } from '@/types';
+import { ScoreInput } from './ScoreInput';
+import { GradeCommentSection } from './GradeCommentSection';
 
 interface EditingCellInfo {
     grade: Grade;
@@ -24,9 +23,6 @@ interface EditGradeDialogProps {
     onClose: () => void;
     adjustScore: (delta: number) => void;
 }
-
-const PRESET_SCORES_MAIN = [5, 6, 7, 8, 9, 10, 12, 15, 20];
-const PRESET_SCORES_HALF = [4.5, 5.5, 6.5, 7.5, 8.5, 9.5];
 
 export function EditGradeDialog({
                                     editingCell,
@@ -68,81 +64,17 @@ export function EditGradeDialog({
 
                     <div className="space-y-2">
                         <Label>Оцінка {!attended && '(можна поставити навіть якщо відсутній)'}</Label>
-                        <div className="flex items-center gap-2">
-                            <Button type="button" variant="outline" size="icon" onClick={() => adjustScore(-0.5)}>
-                                <Minus className="h-4 w-4" />
-                            </Button>
-                            <Input
-                                type="number"
-                                min="0"
-                                step="0.5"
-                                value={score}
-                                onChange={(e) => setScore(e.target.value)}
-                                className="text-center"
-                                placeholder="-"
-                            />
-                            <Button type="button" variant="outline" size="icon" onClick={() => adjustScore(0.5)}>
-                                <Plus className="h-4 w-4" />
-                            </Button>
-                        </div>
-                        <div className="flex flex-wrap gap-2 pt-2">
-                            {PRESET_SCORES_MAIN.map((value) => (
-                                <Button
-                                    key={value}
-                                    type="button"
-                                    variant={score === value.toString() ? 'default' : 'outline'}
-                                    size="sm"
-                                    onClick={() => setScore(value.toString())}
-                                >
-                                    {value}
-                                </Button>
-                            ))}
-                        </div>
-                        <div className="flex flex-wrap gap-2 pt-1">
-                            {PRESET_SCORES_HALF.map((value) => (
-                                <Button
-                                    key={value}
-                                    type="button"
-                                    variant={score === value.toString() ? 'default' : 'outline'}
-                                    size="sm"
-                                    onClick={() => setScore(value.toString())}
-                                >
-                                    {value}
-                                </Button>
-                            ))}
-                        </div>
+                        <ScoreInput
+                            score={score}
+                            setScore={setScore}
+                            adjustScore={adjustScore}
+                        />
                     </div>
 
-                    <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                            <Label htmlFor="comment" className="flex items-center gap-2">
-                                <MessageSquare className="h-4 w-4" />
-                                Коментар до оцінки
-                            </Label>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setComment('')}
-                                disabled={!comment}
-                                className="text-xs text-gray-500 hover:text-gray-800 h-7 px-2"
-                            >
-                                <X className="h-3 w-3 mr-1" />
-                                Очистити
-                            </Button>
-                        </div>
-                        <Textarea
-                            id="comment"
-                            value={comment}
-                            onChange={(e) => setComment(e.target.value)}
-                            placeholder="Наприклад: здав роботу пізно, відпрацював пропуск, виконав додаткове завдання..."
-                            rows={3}
-                            className="resize-none"
-                        />
-                        <p className="text-xs text-gray-500">
-                            Коментар буде відображатися біля оцінки з іконкою
-                        </p>
-                    </div>
+                    <GradeCommentSection
+                        comment={comment}
+                        setComment={setComment}
+                    />
                 </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={onClose}>
