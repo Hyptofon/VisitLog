@@ -15,7 +15,6 @@ export default function App() {
     const [grades, setGrades] = useState<Grade[]>(initialGrades);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<JournalType>('all');
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const handleGradeUpdate = (updatedGrade: Grade) => {
         setGrades(prevGrades =>
@@ -132,8 +131,6 @@ export default function App() {
             setActiveTab={setActiveTab}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            mobileMenuOpen={mobileMenuOpen}
-            setMobileMenuOpen={setMobileMenuOpen}
             onBack={() => setSelectedType(null)}
             onExportExcel={handleExportExcel}
             onExportPDF={handleExportPDF}

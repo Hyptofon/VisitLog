@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { ArrowLeft, Download, FileSpreadsheet, Menu } from 'lucide-react';
 import { Button } from './ui/button';
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
@@ -12,8 +12,6 @@ interface LayoutProps {
     setActiveTab: (type: JournalType) => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
-    mobileMenuOpen: boolean;
-    setMobileMenuOpen: (open: boolean) => void;
     onBack: () => void;
     onExportExcel: () => void;
     onExportPDF: () => void;
@@ -25,12 +23,22 @@ export function Layout({
                            setActiveTab,
                            searchQuery,
                            setSearchQuery,
-                           mobileMenuOpen,
-                           setMobileMenuOpen,
                            onBack,
                            onExportExcel,
                            onExportPDF
                        }: LayoutProps) {
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const handleMobileExportExcel = () => {
+        onExportExcel();
+        setMobileMenuOpen(false);
+    };
+
+    const handleMobileExportPDF = () => {
+        onExportPDF();
+        setMobileMenuOpen(false);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <header className="bg-white dark:bg-gray-950/50 dark:border-gray-800 border-b sticky top-0 z-50 shadow-sm">
@@ -50,7 +58,7 @@ export function Layout({
                                         <Button
                                             variant="outline"
                                             className="w-full justify-start"
-                                            onClick={() => { onExportExcel(); setMobileMenuOpen(false); }}
+                                            onClick={handleMobileExportExcel}
                                         >
                                             <FileSpreadsheet className="h-4 w-4 mr-2" />
                                             Експорт в Excel
@@ -58,7 +66,7 @@ export function Layout({
                                         <Button
                                             variant="outline"
                                             className="w-full justify-start"
-                                            onClick={() => { onExportPDF(); setMobileMenuOpen(false); }}
+                                            onClick={handleMobileExportPDF}
                                         >
                                             <Download className="h-4 w-4 mr-2" />
                                             Експорт в PDF
