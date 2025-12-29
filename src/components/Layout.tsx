@@ -4,7 +4,6 @@ import { Button } from './ui/button';
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import { SearchBar } from './SearchBar';
-import { Toaster } from 'sonner';
 import { JournalType } from '@/types';
 
 interface LayoutProps {
@@ -34,7 +33,6 @@ export function Layout({
                        }: LayoutProps) {
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <Toaster position="top-right" expand={true} richColors />
             <header className="bg-white dark:bg-gray-950/50 dark:border-gray-800 border-b sticky top-0 z-50 shadow-sm">
                 <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
                     <div className="md:hidden">

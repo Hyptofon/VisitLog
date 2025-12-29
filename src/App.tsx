@@ -7,7 +7,7 @@ import { StatsCards } from './components/StatsCards';
 import { students, lessons, initialGrades } from './data/mockData';
 import { Grade, JournalType } from './types';
 import { exportToExcel, exportToPDF } from './utils/exportUtils';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 import { Layout } from './components/Layout';
 
 export default function App() {
@@ -45,7 +45,6 @@ export default function App() {
     if (!selectedType) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-black dark:to-gray-800 flex items-center justify-center p-4">
-                <Toaster position="top-right" expand={true} richColors />
                 <Card className="max-w-2xl w-full p-6 md:p-8 dark:bg-gray-800/50 dark:border-gray-700">
                     <div className="text-center mb-6 md:mb-8">
                         <h1 className="mb-2 text-xl md:text-2xl font-bold">Журнал відвідувань</h1>
