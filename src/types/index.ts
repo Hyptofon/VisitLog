@@ -1,31 +1,31 @@
 export interface Student {
-    id: number;
-    firstName: string;
-    lastName: string;
-    patronymic: string;
+  id: number;
+  firstName: string;
+  lastName: string;
+  patronymic: string;
 }
 
 export interface Lesson {
-    id: number;
-    date: string;
-    type: 'lecture' | 'practical' | 'laboratory';
-    number: number;
+  id: number;
+  date: string;
+  type: "lecture" | "practical" | "laboratory";
+  number: number;
 }
 
 export interface Grade {
-    studentId: number;
-    lessonId: number;
-    score: number | null;
-    extraPoints: number;
-    attended: boolean;
-    comment?: string;
+  studentId: number;
+  lessonId: number;
+  score: number | null;
+  extraPoints: number;
+  attended: boolean;
+  comment?: string;
 }
 
 export interface StudentNote {
-    id: number;
-    text: string;
-    timestamp: string;
-    author: string;
+  id: number;
+  text: string;
+  timestamp: string;
+  author: string;
 }
 
-export type JournalType = 'lecture' | 'practical' | 'laboratory' | 'all';
+export type JournalType = "lecture" | "practical" | "laboratory" | "all";

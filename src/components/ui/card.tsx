@@ -1,13 +1,13 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef } from "react";
 
 const Card = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-    ({ className, ...props }, ref) => (
-        <div
-            ref={ref}
-            className={`rounded-lg border bg-card text-card-foreground shadow-sm ${className}`}
-            {...props}
-        />
-    )
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={`rounded-lg border bg-card text-card-foreground shadow-sm ${className}`}
+      {...props}
+    />
+  ),
 );
 Card.displayName = "Card";
 
