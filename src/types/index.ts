@@ -21,10 +21,11 @@ export interface Grade {
     comment?: string;
 }
 
-
 export interface StudentNote {
     id: number;
     text: string;
     timestamp: string;
     author: string;
 }
+
+export type JournalType = 'lecture' | 'practical' | 'laboratory' | 'all';
