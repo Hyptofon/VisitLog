@@ -343,4 +343,3 @@ const filteredStudents = useMemo(() => {
 
 ```
 
-```
